@@ -15,10 +15,6 @@ from uicu._utils import ensure_locale
 from uicu.exceptions import OperationError
 from uicu.locale import Locale
 
-# Constants
-MAGIC_TWO = 2  # Used in list formatting for 2-item lists
-
-
 class DateTimeFormatter:
     """Formats datetime objects according to locale conventions.
 

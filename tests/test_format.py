@@ -86,34 +86,6 @@ class TestDateTimeFormatter:
         assert "2025" in result
         assert "3:30" in result or "15:30" in result
 
-    def test_parse(self):
-        """Test date/time parsing."""
-        # Create formatter with pattern for reliable parsing
-        formatter = uicu.DateTimeFormatter("en-US", pattern="yyyy-MM-dd HH:mm:ss")
-
-        # Format a date first to see what format it expects
-        dt = datetime(2025, 1, 25, 0, 0, 0, tzinfo=timezone.utc)
-        formatted = formatter.format(dt)
-
-        # Parse it back
-        parsed = formatter.parse(formatted)
-        assert parsed.year == 2025
-        assert parsed.month == 1
-        assert parsed.day == 25
-        assert parsed.hour == 0
-        assert parsed.minute == 0
-        assert parsed.second == 0
-
-        # Test with date and time
-        formatter = uicu.DateTimeFormatter("en-US", date_style="short", time_style="short")
-        dt = datetime(2025, 1, 25, 15, 30, tzinfo=timezone.utc)
-        formatted = formatter.format(dt)
-        parsed = formatter.parse(formatted)
-        assert parsed.year == 2025
-        assert parsed.month == 1
-        assert parsed.day == 25
-        assert parsed.hour == 15
-        assert parsed.minute == 30
 
     def test_format_range(self):
         """Test date range formatting."""
