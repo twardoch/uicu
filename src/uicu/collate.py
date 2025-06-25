@@ -7,11 +7,10 @@ enabling locale-sensitive string comparison and sorting.
 """
 
 from collections.abc import Iterable
-from typing import List, Union
 
 import icu
 
-from uicu.exceptions import CollationError
+from uicu.exceptions import ConfigurationError, OperationError
 from uicu.locale import Locale
 
 # Map string strength names to ICU constants
@@ -56,7 +55,7 @@ class Collator:
             case_level: Enable separate case level between secondary and tertiary.
 
         Raises:
-            CollationError: If locale or configuration is invalid.
+            ConfigurationError: If locale or configuration is invalid.
         """
         # Convert string locale to Locale object if needed
         if isinstance(locale, str):
@@ -64,19 +63,15 @@ class Collator:
                 locale = Locale(locale)
             except Exception as e:
                 msg = f"Invalid locale '{locale}': {e}"
-                raise CollationError(msg) from e
+                raise ConfigurationError(msg) from e
 
         # Create ICU collator
-        try:
-            self._collator = icu.Collator.createInstance(locale._icu_locale)
-        except Exception as e:
-            msg = f"Failed to create collator: {e}"
-            raise CollationError(msg) from e
+        self._collator = icu.Collator.createInstance(locale._icu_locale)
 
         # Set strength
         if strength not in STRENGTH_MAP:
             msg = f"Invalid strength '{strength}'. Must be one of: {', '.join(STRENGTH_MAP.keys())}"
-            raise CollationError(msg)
+            raise ConfigurationError(msg)
         self._collator.setStrength(STRENGTH_MAP[strength])
 
         # Configure numeric sorting
@@ -100,25 +95,16 @@ class Collator:
 
     def compare(self, a: str, b: str) -> int:
         """Compare two strings according to collation rules.
-
-        Args:
-            a: First string to compare.
-            b: Second string to compare.
-
-        Returns:
-            -1 if a < b, 0 if a == b, 1 if a > b.
+        
+        Returns -1 if a < b, 0 if a == b, 1 if a > b.
         """
-        try:
-            result = self._collator.compare(a, b)
-            # Normalize to -1, 0, 1
-            if result < 0:
-                return -1
-            if result > 0:
-                return 1
-            return 0
-        except Exception as e:
-            msg = f"Comparison failed: {e}"
-            raise CollationError(msg) from e
+        result = self._collator.compare(a, b)
+        # Normalize to -1, 0, 1
+        if result < 0:
+            return -1
+        if result > 0:
+            return 1
+        return 0
 
     def key(self, s: str) -> bytes:
         """Return sort key for string.
@@ -133,12 +119,8 @@ class Collator:
         Returns:
             Sort key as bytes.
         """
-        try:
-            # getSortKey returns bytes directly in PyICU
-            return self._collator.getSortKey(s)
-        except Exception as e:
-            msg = f"Failed to create sort key: {e}"
-            raise CollationError(msg) from e
+        # getSortKey returns bytes directly in PyICU
+        return self._collator.getSortKey(s)
 
     def __call__(self, s: str) -> bytes:
         """Make collator callable as a key function.

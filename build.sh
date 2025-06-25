@@ -19,6 +19,8 @@ IFS=$'\n\t'
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_ROOT"
 
+repomix -o llms.txt . -i research
+
 # ------------------------------- helpers ------------------------------------
 usage() {
     cat <<'EOF'

@@ -34,11 +34,8 @@ from uicu.char import (
 )
 from uicu.collate import Collator, compare, sort
 from uicu.exceptions import (
-    CollationError,
     ConfigurationError,
-    FormattingError,
-    SegmentationError,
-    TransliterationError,
+    OperationError,
     UICUError,
 )
 from uicu.locale import Locale, get_available_locales, get_default_locale
@@ -55,7 +52,29 @@ from uicu.segment import (
     sentences,
     words,
 )
-from uicu.translit import Transliterator, get_available_transforms, transliterate
+from uicu.translit import (
+    Transliterator,
+    find_transforms,
+    get_available_transforms,
+    transliterate,
+)
+
+# Import formatting components
+try:
+    from uicu.format import DateTimeFormatter, ListFormatter, NumberFormatter
+except ImportError:
+    # Format module not yet fully implemented
+    DateTimeFormatter = None
+    ListFormatter = None
+    NumberFormatter = None
+
+# Import script detection dependencies at module level
+try:
+    from uicu.char import HAS_FONTTOOLS
+    from uicu.char import script as get_script
+except ImportError:
+    HAS_FONTTOOLS = False
+    get_script = None
 
 
 # Script detection helper
@@ -72,10 +91,7 @@ def detect_script(text: str) -> str | None:
         return None
 
     try:
-        from uicu.char import HAS_FONTTOOLS
-        from uicu.char import script as get_script
-
-        if not HAS_FONTTOOLS:
+        if not HAS_FONTTOOLS or get_script is None:
             return None
 
         # Count scripts used
@@ -91,7 +107,7 @@ def detect_script(text: str) -> str | None:
 
         # Return most common script
         return max(script_counts.items(), key=lambda x: x[1])[0]
-    except:
+    except Exception:
         return None
 
 
@@ -104,7 +120,11 @@ __all__ = [
     # Collation
     "Collator",
     "ConfigurationError",
+    # Formatting
+    "DateTimeFormatter",
     "FormattingError",
+    "ListFormatter",
+    "NumberFormatter",
     # Segmentation
     "GraphemeSegmenter",
     "LineSegmenter",
@@ -127,6 +147,7 @@ __all__ = [
     "decimal",
     "detect_script",
     "digit",
+    "find_transforms",
     "get_available_locales",
     "get_available_transforms",
     "get_default_locale",

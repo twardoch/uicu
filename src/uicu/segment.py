@@ -11,7 +11,7 @@ from collections.abc import Iterator
 
 import icu
 
-from uicu.exceptions import SegmentationError
+from uicu.exceptions import ConfigurationError, OperationError
 from uicu.locale import Locale
 
 
@@ -29,26 +29,22 @@ def _create_break_iterator(
         Configured BreakIterator instance.
 
     Raises:
-        SegmentationError: If creation fails.
+        OperationError: If creation fails.
     """
     # Get the ICU locale
     icu_locale = icu.Locale.getDefault() if locale is None else locale._icu_locale
 
     # Create the appropriate iterator
-    try:
-        if kind == "character":
-            return icu.BreakIterator.createCharacterInstance(icu_locale)
-        if kind == "word":
-            return icu.BreakIterator.createWordInstance(icu_locale)
-        if kind == "sentence":
-            return icu.BreakIterator.createSentenceInstance(icu_locale)
-        if kind == "line":
-            return icu.BreakIterator.createLineInstance(icu_locale)
-        msg = f"Unknown iterator kind: {kind}"
-        raise ValueError(msg)
-    except Exception as e:
-        msg = f"Failed to create {kind} iterator: {e}"
-        raise SegmentationError(msg) from e
+    if kind == "character":
+        return icu.BreakIterator.createCharacterInstance(icu_locale)
+    if kind == "word":
+        return icu.BreakIterator.createWordInstance(icu_locale)
+    if kind == "sentence":
+        return icu.BreakIterator.createSentenceInstance(icu_locale)
+    if kind == "line":
+        return icu.BreakIterator.createLineInstance(icu_locale)
+    msg = f"Unknown iterator kind: {kind}"
+    raise ValueError(msg)
 
 
 def _iterate_breaks(
@@ -297,20 +293,20 @@ class BaseSegmenter:
             List of text segments.
         """
         return list(self.segment(text))
-    
+
     def boundaries(self, text: str) -> set[int]:
         """Get boundary positions in text.
-        
+
         Args:
             text: Text to analyze.
-            
+
         Returns:
             Set of boundary positions (character indices).
         """
         # Set text
         uset = icu.UnicodeString(text)
         self._break_iterator.setText(uset)
-        
+
         # Collect all boundaries
         boundaries = set()
         position = self._break_iterator.first()
@@ -325,7 +321,7 @@ class BaseSegmenter:
                 python_pos = len(str(uset[:position]))
                 boundaries.add(python_pos)
             position = self._break_iterator.nextBoundary()
-        
+
         return boundaries
 
 

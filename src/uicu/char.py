@@ -5,8 +5,14 @@
 This module provides Pythonic access to Unicode character information using
 the latest Unicode data from fontTools.unicodedata with fallback to Python's
 built-in unicodedata module.
+
+Note: This module analyzes individual Unicode codepoints. Multi-codepoint
+grapheme clusters (like flag emojis) should be broken into individual
+codepoints for analysis. Use the uicu.segment module for grapheme-aware
+text processing.
 """
 
+import unicodedata
 from typing import Any
 
 try:
@@ -27,16 +33,8 @@ except ImportError:
 
 def _normalize_char_input(char: str | int) -> str:
     """Normalize character input to a single character string.
-
-    Args:
-        char: Either a single character string or an integer codepoint.
-
-    Returns:
-        A single character string.
-
-    Raises:
-        ValueError: If char is not a single character or valid codepoint.
-        TypeError: If the input is not a str or int.
+    
+    Converts integer codepoints to characters and validates string length.
     """
     if isinstance(char, int):
         try:
@@ -46,7 +44,16 @@ def _normalize_char_input(char: str | int) -> str:
             raise ValueError(msg) from e
     if isinstance(char, str):
         if len(char) != 1:
-            msg = f"Expected single character, got string of length {len(char)}"
+            # Check if it might be a multi-codepoint grapheme
+            if len(char) > 1:
+                msg = (
+                    f"Expected single character, got string of length {len(char)}. "
+                    f"Multi-codepoint sequences like '{char}' are not supported. "
+                    f"Consider using char[0] to analyze the first codepoint, "
+                    f"or use uicu.graphemes() for grapheme-aware processing."
+                )
+            else:
+                msg = f"Expected single character, got empty string"
             raise ValueError(msg)
         return char
 
@@ -59,16 +66,8 @@ def _normalize_char_input(char: str | int) -> str:
 
 def name(char: str | int, default: str | None = None) -> str | None:
     """Return Unicode name of character.
-
-    Args:
-        char: A single character or integer codepoint.
-        default: Default value if character has no name.
-
-    Returns:
-        The Unicode name of the character, or default if provided.
-
-    Raises:
-        ValueError: If no name and no default provided.
+    
+    Returns default if character has no name, raises ValueError if no default.
     """
     char = _normalize_char_input(char)
     try:
@@ -80,73 +79,33 @@ def name(char: str | int, default: str | None = None) -> str | None:
 
 
 def category(char: str | int) -> str:
-    """Return general category (e.g., 'Lu' for uppercase letter).
-
-    Args:
-        char: A single character or integer codepoint.
-
-    Returns:
-        Two-letter general category code.
-    """
+    """Return general category (e.g., 'Lu' for uppercase letter)."""
     char = _normalize_char_input(char)
     return ftunicodedata.category(char)
 
 
 def bidirectional(char: str | int) -> str:
-    """Return bidirectional class.
-
-    Args:
-        char: A single character or integer codepoint.
-
-    Returns:
-        Bidirectional class (e.g., 'L' for left-to-right).
-    """
+    """Return bidirectional class (e.g., 'L' for left-to-right)."""
     char = _normalize_char_input(char)
     return ftunicodedata.bidirectional(char)
 
 
 def combining(char: str | int) -> int:
-    """Return canonical combining class.
-
-    Args:
-        char: A single character or integer codepoint.
-
-    Returns:
-        Canonical combining class as integer.
-    """
+    """Return canonical combining class as integer."""
     char = _normalize_char_input(char)
     return ftunicodedata.combining(char)
 
 
 def mirrored(char: str | int) -> bool:
-    """Return True if character is mirrored in bidi text.
-
-    Args:
-        char: A single character or integer codepoint.
-
-    Returns:
-        True if character is mirrored, False otherwise.
-    """
+    """Return True if character is mirrored in bidi text."""
     char = _normalize_char_input(char)
     # fontTools.unicodedata doesn't have mirrored property
     # Always use built-in unicodedata for this
-    import unicodedata
     return bool(unicodedata.mirrored(char))
 
 
 def decimal(char: str | int, default: Any = None) -> int | None:
-    """Return decimal value of character.
-
-    Args:
-        char: A single character or integer codepoint.
-        default: Default value if character has no decimal value.
-
-    Returns:
-        Decimal value as integer, or default if provided.
-
-    Raises:
-        ValueError: If no decimal value and no default provided.
-    """
+    """Return decimal value of character, or default if none."""
     char = _normalize_char_input(char)
     try:
         return ftunicodedata.decimal(char)
@@ -175,18 +134,7 @@ def digit(char: str | int, default: Any = None) -> int | None:
 
 
 def numeric(char: str | int, default: Any = None) -> int | float | None:
-    """Return numeric value of character.
-
-    Args:
-        char: A single character or integer codepoint.
-        default: Default value if character has no numeric value.
-
-    Returns:
-        Numeric value as int or float, or default if provided.
-
-    Raises:
-        ValueError: If no numeric value and no default provided.
-    """
+    """Return numeric value of character, or default if none."""
     char = _normalize_char_input(char)
     try:
         return ftunicodedata.numeric(char)
@@ -198,14 +146,7 @@ def numeric(char: str | int, default: Any = None) -> int | float | None:
 
 
 def script(char: str | int) -> str:
-    """Return ISO 15924 script code (e.g., 'Latn', 'Hani').
-
-    Args:
-        char: A single character or integer codepoint.
-
-    Returns:
-        Four-letter script code.
-    """
+    """Return ISO 15924 script code (e.g., 'Latn', 'Hani')."""
     if not HAS_FONTTOOLS:
         msg = "script() requires fontTools.unicodedata"
         raise NotImplementedError(msg)
@@ -214,14 +155,7 @@ def script(char: str | int) -> str:
 
 
 def script_name(code: str) -> str:
-    """Return human-readable script name.
-
-    Args:
-        code: Four-letter ISO 15924 script code.
-
-    Returns:
-        Human-readable script name.
-    """
+    """Return human-readable script name for ISO 15924 code."""
     if not HAS_FONTTOOLS:
         msg = "script_name() requires fontTools.unicodedata"
         raise NotImplementedError(msg)
@@ -229,14 +163,7 @@ def script_name(code: str) -> str:
 
 
 def script_extensions(char: str | int) -> set[str]:
-    """Return set of scripts that use this character.
-
-    Args:
-        char: A single character or integer codepoint.
-
-    Returns:
-        Set of script codes.
-    """
+    """Return set of scripts that use this character."""
     if not HAS_FONTTOOLS:
         msg = "script_extensions() requires fontTools.unicodedata"
         raise NotImplementedError(msg)
@@ -288,6 +215,11 @@ class Char:
 
     This class provides an object-oriented interface to Unicode character
     properties, bundling all property access into a single object.
+    
+    Note: This class currently only supports single Unicode codepoints.
+    Multi-codepoint grapheme clusters (like flag emojis 🇺🇸) are not
+    supported. Use the first codepoint or iterate over the string to
+    analyze individual codepoints.
     """
 
     def __init__(self, char: str | int):
@@ -295,6 +227,10 @@ class Char:
 
         Args:
             char: A single character string or integer codepoint.
+                  Multi-codepoint sequences like flag emojis are not supported.
+                  
+        Raises:
+            ValueError: If char is a multi-character string.
         """
         self._char = _normalize_char_input(char)
         self._codepoint = ord(self._char)

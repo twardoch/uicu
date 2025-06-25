@@ -6,11 +6,9 @@ This module provides Pythonic interfaces for ICU's transliteration functionality
 enabling script conversion and various text transformations.
 """
 
-from typing import List, Union
-
 import icu
 
-from uicu.exceptions import TransliterationError
+from uicu.exceptions import ConfigurationError, OperationError
 
 
 class Transliterator:
@@ -28,7 +26,7 @@ class Transliterator:
             direction: 'forward' or 'reverse'.
 
         Raises:
-            TransliterationError: If transform ID is invalid or creation fails.
+            ConfigurationError: If transform ID is invalid or creation fails.
         """
         # Map direction string to ICU constant
         if direction == "forward":
@@ -37,14 +35,10 @@ class Transliterator:
             icu_direction = icu.UTransDirection.REVERSE
         else:
             msg = f"Invalid direction '{direction}'. Must be 'forward' or 'reverse'."
-            raise TransliterationError(msg)
+            raise ConfigurationError(msg)
 
-        # Create ICU transliterator
-        try:
-            self._transliterator = icu.Transliterator.createInstance(transform_id, icu_direction)
-        except Exception as e:
-            msg = f"Failed to create transliterator for '{transform_id}': {e}"
-            raise TransliterationError(msg) from e
+        # Create ICU transliterator - let ICU errors propagate
+        self._transliterator = icu.Transliterator.createInstance(transform_id, icu_direction)
 
         # Store configuration
         self._transform_id = transform_id
@@ -61,22 +55,18 @@ class Transliterator:
         Returns:
             Transformed text.
         """
-        try:
-            if filter_fn is None:
-                # ICU transliterate modifies the string in-place if using UnicodeString
-                # But with Python strings, it returns a new string
-                return self._transliterator.transliterate(text)
-            # Apply transliteration selectively
-            result = []
-            for char in text:
-                if filter_fn(char):
-                    result.append(self._transliterator.transliterate(char))
-                else:
-                    result.append(char)
-            return "".join(result)
-        except Exception as e:
-            msg = f"Transliteration failed: {e}"
-            raise TransliterationError(msg) from e
+        if filter_fn is None:
+            # ICU transliterate modifies the string in-place if using UnicodeString
+            # But with Python strings, it returns a new string
+            return self._transliterator.transliterate(text)
+        # Apply transliteration selectively
+        result = []
+        for char in text:
+            if filter_fn(char):
+                result.append(self._transliterator.transliterate(char))
+            else:
+                result.append(char)
+        return "".join(result)
 
     def __call__(self, text: str) -> str:
         """Make transliterator callable.
@@ -96,23 +86,19 @@ class Transliterator:
             New Transliterator instance for reverse transformation.
 
         Raises:
-            TransliterationError: If inverse is not available.
+            ConfigurationError: If inverse is not available.
         """
-        try:
-            # Create inverse transliterator
-            inverse_trans = self._transliterator.createInverse()
+        # Create inverse transliterator
+        inverse_trans = self._transliterator.createInverse()
 
-            # Wrap in new Transliterator instance
-            # We need to create a new instance that wraps the inverse
-            new_instance = object.__new__(Transliterator)
-            new_instance._transliterator = inverse_trans
-            new_instance._transform_id = f"{self._transform_id}_inverse"
-            new_instance._direction = "reverse" if self._direction == "forward" else "forward"
+        # Wrap in new Transliterator instance
+        # We need to create a new instance that wraps the inverse
+        new_instance = object.__new__(Transliterator)
+        new_instance._transliterator = inverse_trans
+        new_instance._transform_id = f"{self._transform_id}_inverse"
+        new_instance._direction = "reverse" if self._direction == "forward" else "forward"
 
-            return new_instance
-        except Exception as e:
-            msg = f"Failed to create inverse transliterator: {e}"
-            raise TransliterationError(msg) from e
+        return new_instance
 
     @classmethod
     def from_rules(cls, name: str, rules: str, direction: str = "forward") -> "Transliterator":
@@ -127,7 +113,7 @@ class Transliterator:
             New Transliterator instance.
 
         Raises:
-            TransliterationError: If rules are invalid.
+            ConfigurationError: If rules are invalid.
         """
         # Map direction string to ICU constant
         if direction == "forward":
@@ -136,22 +122,18 @@ class Transliterator:
             icu_direction = icu.UTransDirection.REVERSE
         else:
             msg = f"Invalid direction '{direction}'. Must be 'forward' or 'reverse'."
-            raise TransliterationError(msg)
+            raise ConfigurationError(msg)
 
-        try:
-            # Create transliterator from rules
-            icu_trans = icu.Transliterator.createFromRules(name, rules, icu_direction)
+        # Create transliterator from rules
+        icu_trans = icu.Transliterator.createFromRules(name, rules, icu_direction)
 
-            # Wrap in new Transliterator instance
-            new_instance = object.__new__(cls)
-            new_instance._transliterator = icu_trans
-            new_instance._transform_id = name
-            new_instance._direction = direction
+        # Wrap in new Transliterator instance
+        new_instance = object.__new__(cls)
+        new_instance._transliterator = icu_trans
+        new_instance._transform_id = name
+        new_instance._direction = direction
 
-            return new_instance
-        except Exception as e:
-            msg = f"Failed to create transliterator from rules: {e}"
-            raise TransliterationError(msg) from e
+        return new_instance
 
     @property
     def transform_id(self) -> str:
@@ -210,7 +192,7 @@ class Transliterator:
             # Try to create inverse - if it succeeds, inverse exists
             self._transliterator.createInverse()
             return True
-        except:
+        except Exception:
             return False
 
     def get_inverse(self) -> "Transliterator":
@@ -300,10 +282,32 @@ def list_transform_aliases(transform_id: str) -> list[str]:
                     # Compare by ID (not perfect but reasonable)
                     if test_trans.getID() == base_trans.getID():
                         aliases.append(test_id)
-                except:
+                except Exception:
                     pass
 
         return aliases
     except Exception as e:
         msg = f"Failed to get aliases for '{transform_id}': {e}"
-        raise TransliterationError(msg) from e
+        raise ConfigurationError(msg) from e
+
+
+def find_transforms(keyword: str) -> list[str]:
+    """Find transform IDs containing a keyword.
+
+    Useful for discovering available transforms for a script or language.
+
+    Args:
+        keyword: Search term (case-insensitive).
+
+    Returns:
+        List of matching transform IDs.
+
+    Example:
+        >>> find_transforms('cyrillic')
+        ['Any-Cyrillic', 'Cyrillic-Latin', 'Latin-Cyrillic', ...]
+        >>> find_transforms('arabic')
+        ['Any-Arabic', 'Arabic-Latin', 'Latin-Arabic', ...]
+    """
+    keyword_lower = keyword.lower()
+    transforms = get_available_transforms()
+    return [t for t in transforms if keyword_lower in t.lower()]

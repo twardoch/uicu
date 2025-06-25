@@ -2,7 +2,7 @@
 # this_file: tests/test_segment.py
 """Tests for text segmentation module."""
 
-import pytest
+import contextlib
 
 import uicu
 
@@ -189,7 +189,5 @@ class TestSegmentationErrors:
     def test_invalid_locale(self):
         """Test invalid locale handling."""
         # Should fall back to default or raise appropriate error
-        try:
+        with contextlib.suppress(uicu.OperationError):
             list(uicu.words("hello", locale="invalid_locale"))
-        except uicu.SegmentationError:
-            pass  # Expected behavior

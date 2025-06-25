@@ -59,7 +59,7 @@ class TestTransliterator:
 
     def test_invalid_transform(self):
         """Test error handling for invalid transforms."""
-        with pytest.raises(uicu.TransliterationError):
+        with pytest.raises(uicu.ConfigurationError):
             uicu.Transliterator("Invalid-Transform")
 
     def test_compound_transforms(self):

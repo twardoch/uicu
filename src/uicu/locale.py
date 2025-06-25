@@ -36,14 +36,9 @@ class Locale:
     """
 
     def __init__(self, identifier: str):
-        """Create locale from BCP 47 identifier.
-
-        Args:
-            identifier: Locale identifier (e.g., 'en-GB', 'zh-Hant-TW').
-                       Can use either hyphen or underscore as separator.
-
-        Raises:
-            ConfigurationError: If the locale identifier is invalid.
+        """Create locale from BCP 47 identifier (e.g., 'en-GB', 'zh-Hant-TW').
+        
+        Accepts both hyphen and underscore as separator.
         """
         # Normalize identifier (BCP 47 uses hyphens, ICU accepts underscores)
         identifier = identifier.replace("-", "_")
@@ -119,19 +114,12 @@ class Locale:
 
     @property
     def variant(self) -> str:
-        """Variant code if specified.
-
-        Returns:
-            Variant code or empty string.
-        """
+        """Variant code or empty string."""
         return self._variant
 
     @property
     def base_name(self) -> str:
-        """The canonical locale identifier.
-
-        Returns:
-            Canonical form like 'en_GB' or 'zh_Hant_TW'.
+        """The canonical locale identifier (e.g., 'en_GB', 'zh_Hant_TW').
         """
         return self._icu_locale.getBaseName()
 
@@ -163,71 +151,72 @@ class Locale:
 
         return Collator(self, strength=strength, numeric=numeric, **kwargs)
 
-    # TODO: Implement formatters
-    # def get_datetime_formatter(
-    #     self,
-    #     date_style: str = "medium",
-    #     time_style: str = "medium",
-    #     **kwargs,
-    # ) -> "DateTimeFormatter":
-    #     """Create a date/time formatter for this locale.
-    #
-    #     Args:
-    #         date_style: Date format style - 'full', 'long', 'medium', 'short', 'none'.
-    #         time_style: Time format style - 'full', 'long', 'medium', 'short', 'none'.
-    #         **kwargs: Additional options passed to DateTimeFormatter.
-    #
-    #     Returns:
-    #         A configured DateTimeFormatter instance.
-    #     """
-    #     from uicu.format import DateTimeFormatter
-    #
-    #     return DateTimeFormatter(
-    #         self,
-    #         date_style=date_style,
-    #         time_style=time_style,
-    #         **kwargs,
-    #     )
-    #
-    # def get_date_formatter(
-    #     self,
-    #     style: str = "medium",
-    #     **kwargs,
-    # ) -> "DateTimeFormatter":
-    #     """Create a date-only formatter for this locale.
-    #
-    #     Args:
-    #         style: Format style - 'full', 'long', 'medium', 'short'.
-    #         **kwargs: Additional options passed to DateTimeFormatter.
-    #
-    #     Returns:
-    #         A configured DateTimeFormatter instance.
-    #     """
-    #     return self.get_datetime_formatter(
-    #         date_style=style,
-    #         time_style="none",
-    #         **kwargs,
-    #     )
-    #
-    # def get_time_formatter(
-    #     self,
-    #     style: str = "medium",
-    #     **kwargs,
-    # ) -> "DateTimeFormatter":
-    #     """Create a time-only formatter for this locale.
-    #
-    #     Args:
-    #         style: Format style - 'full', 'long', 'medium', 'short'.
-    #         **kwargs: Additional options passed to DateTimeFormatter.
-    #
-    #     Returns:
-    #         A configured DateTimeFormatter instance.
-    #     """
-    #     return self.get_datetime_formatter(
-    #         date_style="none",
-    #         time_style=style,
-    #         **kwargs,
-    #     )
+    def get_datetime_formatter(
+        self,
+        date_style: str = "medium",
+        time_style: str = "medium",
+        **kwargs,
+    ) -> "DateTimeFormatter":
+        """Create a date/time formatter for this locale.
+
+        Args:
+            date_style: Date format style - 'full', 'long', 'medium', 'short', 'none'.
+            time_style: Time format style - 'full', 'long', 'medium', 'short', 'none'.
+            **kwargs: Additional options passed to DateTimeFormatter.
+
+        Returns:
+            A configured DateTimeFormatter instance.
+        """
+        # Import here to avoid circular imports
+        from uicu.format import DateTimeFormatter
+
+        return DateTimeFormatter(
+            self,
+            date_style=date_style,
+            time_style=time_style,
+            **kwargs,
+        )
+
+    def get_date_formatter(
+        self,
+        style: str = "medium",
+        **kwargs,
+    ) -> "DateTimeFormatter":
+        """Create a date-only formatter for this locale.
+
+        Args:
+            style: Format style - 'full', 'long', 'medium', 'short'.
+            **kwargs: Additional options passed to DateTimeFormatter.
+
+        Returns:
+            A configured DateTimeFormatter instance.
+        """
+        return self.get_datetime_formatter(
+            date_style=style,
+            time_style="none",
+            **kwargs,
+        )
+
+    def get_time_formatter(
+        self,
+        style: str = "medium",
+        **kwargs,
+    ) -> "DateTimeFormatter":
+        """Create a time-only formatter for this locale.
+
+        Args:
+            style: Format style - 'full', 'long', 'medium', 'short'.
+            **kwargs: Additional options passed to DateTimeFormatter.
+
+        Returns:
+            A configured DateTimeFormatter instance.
+        """
+        return self.get_datetime_formatter(
+            date_style="none",
+            time_style=style,
+            **kwargs,
+        )
+
     #
     # def get_number_formatter(
     #     self,
