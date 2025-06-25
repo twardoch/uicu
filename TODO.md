@@ -5,9 +5,15 @@ PyICU does not have a very pythonic API. I’d like us to make `uicu`, a very ex
 
 ## Task 1
 
-Research and meticulously document the various APIs supported by these packages
+Check the various APIs supported by these packages
 
 - https://fonttools.readthedocs.io/en/latest/unicodedata/index.html which includes info about writing systems but otherwise is based on https://github.com/fonttools/unicodedata2 which is like https://docs.python.org/3/library/unicodedata.html but uptodate
 - https://pypi.org/project/pyicu/
 
+Read all the research contained in the `research/` folder. 
+
 Think, consult widely, and then make a very detailed, considerate plan for this new `uicu` package. Write a detailed spec that will guide a junior developer by hand allowing her to develop `uric`
+
+Write the spec into the `TODO.md` document. 
+
+Then completely implement the `TODO.md`. Be resilient, work autonomously, don't stop until you’ve created a complete package. 
