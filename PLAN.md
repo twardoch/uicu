@@ -7,6 +7,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## Current State (v0.2.0-dev)
 
 ### ✅ Successfully Implemented
+
 1. **Character Properties** - Complete Unicode character analysis (95% coverage)
 2. **Locale Management** - BCP 47 compliant handling (90% coverage)
 3. **Collation & Sorting** - Culture-aware comparison (95% coverage)
@@ -15,6 +16,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 6. **Date/Time Formatting** - Formatting works, parsing broken (60% coverage)
 
 ### ⚠️ Issues Requiring Fixes
+
 1. **src/uicu/uicu.py** - Already removed (placeholder file deleted)
 2. **DateTimeFormatter parsing** - Returns 1970 dates (millisecond bug)
 3. **Transliterator transform IDs** - Some IDs incorrect
@@ -22,6 +24,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 5. **Exception over-engineering** - Too many custom exceptions
 
 ### ❌ Not Yet Implemented
+
 1. **Sphinx documentation** - Not set up
 2. **Performance benchmarks** - Not created
 3. **CI/CD pipeline** - Not configured
@@ -58,6 +61,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## v1.0 MVP Strategy
 
 ### Core Principles
+
 1. **Reliability First** - Only ship features that work 100%
 2. **Performance Focus** - <5% overhead vs raw PyICU
 3. **Minimal Surface** - Fewer classes, more functions
@@ -65,6 +69,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 5. **Small & Fast** - <100KB package, <100ms imports
 
 ### Keep for v1.0 (Working Features)
+
 | Feature | Status | Action |
 |---------|--------|--------|
 | Character Properties | ✅ Works | Fix multi-codepoint handling |
@@ -75,6 +80,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 | Date Formatting | ⚡ Partial | Keep formatting, remove parsing |
 
 ### Remove for v1.0 (Defer/Delete)
+
 | Feature | Reason | Action |
 |---------|--------|--------|
 | DateTimeFormatter.parse() | Broken (1970 bug) | Delete method |
@@ -88,12 +94,14 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## Implementation Plan (Priority Order)
 
 ### Phase 1: Critical Fixes (Week 1) ✅ COMPLETE
+
 - [x] Fix DateTimeFormatter.parse() or remove it entirely (never implemented, no action needed)
 - [x] Fix transliterator transform IDs (Issue #202 - added find_transforms() helper)
 - [x] Fix multi-codepoint handling in Char class (documented limitation with helpful errors)
 - [x] Remove all TODO stub comments from format.py (none found)
 
 ### Phase 2: Code Cleanup (Week 2) ✅ COMPLETE
+
 - [x] Simplify exception handling across all modules
 - [x] Remove excessive try-except wrapping
 - [x] Clean up verbose docstrings
@@ -102,6 +110,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 - [x] Remove hardcoded category mappings from demo
 
 ### Phase 3: API Simplification (Week 3) ✅ COMPLETE
+
 - [x] Consolidate duplicate validation code
 - [x] Reduce custom exceptions usage (removed unnecessary wrapping)
 - [x] Remove field position tracking stubs
@@ -111,6 +120,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 - [ ] Make internal classes private (_prefixed)
 
 ### Phase 4: Documentation & Testing (Week 4)
+
 - [ ] Set up Sphinx with modern theme (Furo)
 - [ ] Auto-generate API documentation from docstrings
 - [ ] Write user guides for common use cases
@@ -125,6 +135,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## Success Metrics
 
 ### v1.0 Target Metrics
+
 | Metric | Current | Target | Impact |
 |--------|---------|--------|--------|
 | Test Coverage | ~80% | >95% | Higher reliability |
@@ -135,6 +146,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 | Working Features | 90% | 100% | No broken features |
 
 ### Code Quality Improvements
+
 - **Exception Classes**: 6 → 3 (50% reduction)
 - **Import Complexity**: High → Low
 - **Docstring Verbosity**: 40% reduction
@@ -144,6 +156,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## Migration Path
 
 ### From v0.2.0-dev to v1.0
+
 1. **Breaking Changes**
    - DateTimeFormatter.parse() removed
    - Some exception classes consolidated
@@ -162,6 +175,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## Post-v1.0 Roadmap (v1.1+)
 
 ### v1.1 - Enhanced Features
+
 - NumberFormatter for currency, percentages, scientific notation
 - ListFormatter for proper locale-aware list joining
 - MessageFormatter for complex pluralization
@@ -169,6 +183,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 - Bulk processing APIs
 
 ### v1.2 - Ecosystem Integration
+
 - Django integration
 - pandas Unicode extension
 - FastAPI i18n plugin
@@ -177,6 +192,7 @@ The `uicu` project has successfully implemented core Unicode functionality with 
 ## Conclusion
 
 The path to v1.0 focuses on delivering a reliable, performant Unicode library by:
+
 1. Fixing all broken features or removing them
 2. Streamlining the codebase for maintainability
 3. Optimizing for performance and size
