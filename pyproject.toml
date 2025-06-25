@@ -11,10 +11,20 @@
 #------------------------------------------------------------------------------
 [project]
 name = 'uicu' # Package name on PyPI
-description = '' # Short description
+description = 'A Pythonic wrapper around PyICU with supplementary Unicode functionality from fontTools.unicodedata' # Short description
 readme = 'README.md' # Path to README file
 requires-python = '>=3.10' # Minimum Python version
 keywords = [
+    'unicode',
+    'icu',
+    'pyicu',
+    'i18n',
+    'internationalization',
+    'localization',
+    'text',
+    'collation',
+    'segmentation',
+    'transliteration',
 ] # Keywords for PyPI search
 dynamic = ["version"] # Fields set dynamically at build time
 
@@ -33,6 +43,8 @@ classifiers = [
 ]
 
 dependencies = [
+    'PyICU>=2.11',
+    'fontTools[unicode]>=4.38.0',
 ]
 
 # Author information
@@ -281,9 +293,12 @@ warn_no_return = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
+module = "icu.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = ["tests.*"]
 disallow_untyped_defs = false
-disallow_incomplete_defs = false
 
 #------------------------------------------------------------------------------
 # PYTEST CONFIGURATION
@@ -413,8 +428,8 @@ unfixable = [
     'F401', # Don't automatically remove unused imports - may be needed later
 
 ]
-# Configure extend-exclude to ignore specific directories
-extend-exclude = [".git", ".venv", "venv", "dist", "build"]
+# Configure exclude to ignore specific directories
+exclude = [".git", ".venv", "venv", "dist", "build"]
 
 # isort configuration within Ruff
 [tool.ruff.lint.isort]

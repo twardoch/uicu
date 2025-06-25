@@ -1,0 +1,106 @@
+cmd [1] | ruff format --respect-gitignore src/uicu tests
+2 files left unchanged
+cmd [2] | ruff check --fix src/uicu tests
+src/uicu/uicu.py:9:21: F401 `pathlib.Path` imported but unused
+   |
+ 7 | import logging
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+   |                     ^^^^ F401
+10 | from typing import Any, Dict, List, Optional, Union
+   |
+   = help: Remove unused import: `pathlib.Path`
+
+src/uicu/uicu.py:10:1: UP035 `typing.Dict` is deprecated, use `dict` instead
+   |
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+10 | from typing import Any, Dict, List, Optional, Union
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ UP035
+11 |
+12 | __version__ = "0.1.0"
+   |
+
+src/uicu/uicu.py:10:1: UP035 `typing.List` is deprecated, use `list` instead
+   |
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+10 | from typing import Any, Dict, List, Optional, Union
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ UP035
+11 |
+12 | __version__ = "0.1.0"
+   |
+
+src/uicu/uicu.py:10:25: F401 `typing.Dict` imported but unused
+   |
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+10 | from typing import Any, Dict, List, Optional, Union
+   |                         ^^^^ F401
+11 |
+12 | __version__ = "0.1.0"
+   |
+   = help: Remove unused import
+
+src/uicu/uicu.py:10:31: F401 `typing.List` imported but unused
+   |
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+10 | from typing import Any, Dict, List, Optional, Union
+   |                               ^^^^ F401
+11 |
+12 | __version__ = "0.1.0"
+   |
+   = help: Remove unused import
+
+src/uicu/uicu.py:10:37: F401 `typing.Optional` imported but unused
+   |
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+10 | from typing import Any, Dict, List, Optional, Union
+   |                                     ^^^^^^^^ F401
+11 |
+12 | __version__ = "0.1.0"
+   |
+   = help: Remove unused import
+
+src/uicu/uicu.py:10:47: F401 `typing.Union` imported but unused
+   |
+ 8 | from dataclasses import dataclass
+ 9 | from pathlib import Path
+10 | from typing import Any, Dict, List, Optional, Union
+   |                                               ^^^^^ F401
+11 |
+12 | __version__ = "0.1.0"
+   |
+   = help: Remove unused import
+
+src/uicu/uicu.py:28:35: ARG001 Unused function argument: `config`
+   |
+28 | def process_data(data: list[Any], config: Config | None = None, *, debug: bool = False) -> dict[str, Any]:
+   |                                   ^^^^^^ ARG001
+29 |     """Process the input data according to configuration.
+   |
+
+src/uicu/uicu.py:47:26: EM101 Exception must not use a string literal, assign to variable first
+   |
+46 |     if not data:
+47 |         raise ValueError("Input data cannot be empty")
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ EM101
+48 |
+49 |     # TODO: Implement data processing logic
+   |
+   = help: Assign to variable; remove string literal
+
+tests/test_package.py:6:5: PLC0415 `import` should be at the top-level of a file
+  |
+4 | def test_version():
+5 |     """Verify package exposes version."""
+6 |     import uicu
+  |     ^^^^^^^^^^^ PLC0415
+7 |
+8 |     assert uicu.__version__
+  |
+
+Found 10 errors.
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
