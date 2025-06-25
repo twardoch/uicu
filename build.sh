@@ -19,8 +19,6 @@ IFS=$'\n\t'
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_ROOT"
 
-repomix -o llms.txt . -i research
-
 # ------------------------------- helpers ------------------------------------
 usage() {
     cat <<'EOF'
@@ -73,7 +71,7 @@ clean() {
 
 llms() {
     echo "[build.sh] Regenerating llms.txt with repomix…"
-    npx repomix -o llms.txt .
+    npx repomix -o llms.txt . -i research
 }
 
 # ----------------------------- command router -------------------------------

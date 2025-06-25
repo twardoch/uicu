@@ -33,7 +33,7 @@ except ImportError:
 
 def _normalize_char_input(char: str | int) -> str:
     """Normalize character input to a single character string.
-    
+
     Converts integer codepoints to characters and validates string length.
     """
     if isinstance(char, int):
@@ -53,7 +53,7 @@ def _normalize_char_input(char: str | int) -> str:
                     f"or use uicu.graphemes() for grapheme-aware processing."
                 )
             else:
-                msg = f"Expected single character, got empty string"
+                msg = "Expected single character, got empty string"
             raise ValueError(msg)
         return char
 
@@ -66,7 +66,7 @@ def _normalize_char_input(char: str | int) -> str:
 
 def name(char: str | int, default: str | None = None) -> str | None:
     """Return Unicode name of character.
-    
+
     Returns default if character has no name, raises ValueError if no default.
     """
     char = _normalize_char_input(char)
@@ -215,7 +215,7 @@ class Char:
 
     This class provides an object-oriented interface to Unicode character
     properties, bundling all property access into a single object.
-    
+
     Note: This class currently only supports single Unicode codepoints.
     Multi-codepoint grapheme clusters (like flag emojis 🇺🇸) are not
     supported. Use the first codepoint or iterate over the string to
@@ -228,7 +228,7 @@ class Char:
         Args:
             char: A single character string or integer codepoint.
                   Multi-codepoint sequences like flag emojis are not supported.
-                  
+
         Raises:
             ValueError: If char is a multi-character string.
         """

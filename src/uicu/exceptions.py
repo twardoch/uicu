@@ -5,14 +5,17 @@
 
 class UICUError(Exception):
     """Base exception for all uicu errors."""
+
     pass
 
 
 class ConfigurationError(UICUError):
     """Invalid configuration (locale, pattern, etc.)."""
+
     pass
 
 
 class OperationError(UICUError):
     """Error during runtime operations (formatting, collation, etc.)."""
+
     pass

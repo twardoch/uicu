@@ -10,7 +10,8 @@ from collections.abc import Iterable
 
 import icu
 
-from uicu.exceptions import ConfigurationError, OperationError
+from uicu._utils import ensure_locale
+from uicu.exceptions import ConfigurationError
 from uicu.locale import Locale
 
 # Map string strength names to ICU constants
@@ -58,12 +59,7 @@ class Collator:
             ConfigurationError: If locale or configuration is invalid.
         """
         # Convert string locale to Locale object if needed
-        if isinstance(locale, str):
-            try:
-                locale = Locale(locale)
-            except Exception as e:
-                msg = f"Invalid locale '{locale}': {e}"
-                raise ConfigurationError(msg) from e
+        locale = ensure_locale(locale)
 
         # Create ICU collator
         self._collator = icu.Collator.createInstance(locale._icu_locale)
@@ -95,7 +91,7 @@ class Collator:
 
     def compare(self, a: str, b: str) -> int:
         """Compare two strings according to collation rules.
-        
+
         Returns -1 if a < b, 0 if a == b, 1 if a > b.
         """
         result = self._collator.compare(a, b)

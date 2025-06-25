@@ -1,0 +1,269 @@
+Othello:uicu adam$ ./build.sh
+Usage: ./build.sh <command>
+
+Commands:
+  deps         Install/update dev dependencies (uv, hatch)
+  lint         Run Ruff linting and formatting checks
+  format       Run Ruff formatter and autofixes
+  type-check   Run mypy static type checking
+  test         Run pytest test suite
+  test-cov     Run tests with coverage report
+  build        Build wheel and sdist using Hatch
+  docs         Build Sphinx HTML documentation
+  clean        Remove build artefacts (build/, dist/, *.egg-info …)
+  llms         Regenerate llms.txt using repomix (requires Node + npx)
+  all          Run deps → format → lint → type-check → test-cov → build
+  help         Show this help message
+Othello:uicu adam$ ./build.sh all
+cmd [1] | ruff format --respect-gitignore src/uicu tests
+15 files left unchanged
+cmd [2] | ruff check --fix src/uicu tests
+src/uicu/format.py:11:20: F401 `typing.Any` imported but unused
+   |
+10 | from datetime import datetime, timezone, tzinfo
+11 | from typing import Any
+   |                    ^^^ F401
+12 |
+13 | import icu
+   |
+   = help: Remove unused import: `typing.Any`
+
+src/uicu/format.py:178:35: ARG002 Unused method argument: `lenient`
+    |
+176 |         return self._formatter.format(icu_time)
+177 |
+178 |     def parse(self, text: str, *, lenient: bool = True) -> datetime:
+    |                                   ^^^^^^^ ARG002
+179 |         """Parse a string to a datetime object.
+    |
+
+src/uicu/format.py:278:32: RUF001 String contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+    |
+276 |         result = dtifmt.format((start_ts, end_ts), from_field, to_field)
+277 |
+278 |         return result.replace("–", "-")  # Use standard hyphen instead of en dash
+    |                                ^ RUF001
+279 |
+280 |     @property
+    |
+
+src/uicu/format.py:321:9: FBT001 Boolean-typed positional argument in function definition
+    |
+319 |         max_fraction_digits: int | None = None,
+320 |         min_integer_digits: int | None = None,
+321 |         grouping: bool = True,
+    |         ^^^^^^^^ FBT001
+322 |         rounding_mode: str = "half_even",
+323 |     ):
+    |
+
+src/uicu/format.py:321:9: FBT002 Boolean default positional argument in function definition
+    |
+319 |         max_fraction_digits: int | None = None,
+320 |         min_integer_digits: int | None = None,
+321 |         grouping: bool = True,
+    |         ^^^^^^^^ FBT002
+322 |         rounding_mode: str = "half_even",
+323 |     ):
+    |
+
+src/uicu/format.py:498:16: RUF002 Docstring contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+    |
+496 |             >>> formatter = NumberFormatter('en-US')
+497 |             >>> formatter.format_range(10, 20)
+498 |             '10–20'
+    |                ^ RUF002
+499 |
+500 |             >>> formatter = NumberFormatter('de-DE', style='currency')
+    |
+
+src/uicu/format.py:502:21: RUF002 Docstring contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+    |
+500 |             >>> formatter = NumberFormatter('de-DE', style='currency')
+501 |             >>> formatter.format_range(10.50, 25.75, 'EUR')
+502 |             '10,50 €–25,75 €'
+    |                     ^ RUF002
+503 |         """
+504 |         try:
+    |
+
+src/uicu/format.py:514:43: RUF001 String contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+    |
+512 |                 start_formatted = self.format(start)
+513 |                 end_formatted = self.format(end)
+514 |                 return f"{start_formatted}–{end_formatted}"
+    |                                           ^ RUF001
+515 |             if self._style == "percent":
+516 |                 range_formatter = range_formatter.numberFormatterBoth(
+    |
+
+src/uicu/format.py:527:39: RUF001 String contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+    |
+525 |             start_formatted = self.format(start)
+526 |             end_formatted = self.format(end)
+527 |             return f"{start_formatted}–{end_formatted}"
+    |                                       ^ RUF001
+528 |
+529 |     @property
+    |
+
+src/uicu/format.py:681:26: PLR2004 Magic value used in comparison, consider replacing `2` with a constant variable
+    |
+679 |         locale_tag = self._locale.language_tag.lower()
+680 |
+681 |         if len(items) == 2:
+    |                          ^ PLR2004
+682 |             # Two items - use appropriate conjunction
+683 |             if self._list_type == "or":
+    |
+
+src/uicu/locale.py:12:35: F401 `typing.Optional` imported but unused
+   |
+10 | from __future__ import annotations
+11 |
+12 | from typing import TYPE_CHECKING, Optional
+   |                                   ^^^^^^^^ F401
+13 |
+14 | import icu
+   |
+   = help: Remove unused import: `typing.Optional`
+
+src/uicu/locale.py:52:38: EM102 Exception must not use an f-string literal, assign to variable first
+   |
+50 |             self._icu_locale = icu.Locale(language_tag)
+51 |         except Exception as e:
+52 |             raise ConfigurationError(f"Failed to create locale for '{language_tag}': {e}") from e
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ EM102
+53 |
+54 |         self._language_tag = language_tag
+   |
+   = help: Assign to variable; remove f-string literal
+
+src/uicu/locale.py:148:9: PLC0415 `import` should be at the top-level of a file
+    |
+146 |             A collator for this locale
+147 |         """
+148 |         from uicu.collate import Collator
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+149 |
+150 |         return Collator(self, strength=strength, numeric=numeric, **kwargs)
+    |
+
+src/uicu/locale.py:157:10: F821 Undefined name `DateTimeFormatter`
+    |
+155 |         time_style: str = "medium",
+156 |         **kwargs,
+157 |     ) -> DateTimeFormatter:
+    |          ^^^^^^^^^^^^^^^^^ F821
+158 |         """Create a date/time formatter for this locale.
+    |
+
+src/uicu/locale.py:168:9: PLC0415 `import` should be at the top-level of a file
+    |
+166 |             A date/time formatter for this locale
+167 |         """
+168 |         from uicu.format import DateTimeFormatter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+169 |
+170 |         return DateTimeFormatter(
+    |
+
+src/uicu/locale.py:181:10: F821 Undefined name `DateTimeFormatter`
+    |
+179 |         style: str = "medium",
+180 |         **kwargs,
+181 |     ) -> DateTimeFormatter:
+    |          ^^^^^^^^^^^^^^^^^ F821
+182 |         """Create a date-only formatter for this locale.
+    |
+
+src/uicu/locale.py:197:10: F821 Undefined name `DateTimeFormatter`
+    |
+195 |         style: str = "medium",
+196 |         **kwargs,
+197 |     ) -> DateTimeFormatter:
+    |          ^^^^^^^^^^^^^^^^^ F821
+198 |         """Create a time-only formatter for this locale.
+    |
+
+src/uicu/locale.py:260:9: PLC0415 `import` should be at the top-level of a file
+    |
+258 |         """
+259 |         # Import here to avoid circular imports
+260 |         from uicu.segment import WordSegmenter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+261 |
+262 |         return WordSegmenter(self)
+    |
+
+src/uicu/locale.py:271:9: PLC0415 `import` should be at the top-level of a file
+    |
+269 |         """
+270 |         # Import here to avoid circular imports
+271 |         from uicu.segment import GraphemeSegmenter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+272 |
+273 |         return GraphemeSegmenter(self)
+    |
+
+src/uicu/locale.py:282:9: PLC0415 `import` should be at the top-level of a file
+    |
+280 |         """
+281 |         # Import here to avoid circular imports
+282 |         from uicu.segment import SentenceSegmenter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+283 |
+284 |         return SentenceSegmenter(self)
+    |
+
+src/uicu/segment.py:10:29: F401 `uicu.exceptions.ConfigurationError` imported but unused
+   |
+ 8 | import icu
+ 9 |
+10 | from uicu.exceptions import ConfigurationError, OperationError
+   |                             ^^^^^^^^^^^^^^^^^^ F401
+11 | from uicu.locale import Locale
+   |
+   = help: Remove unused import
+
+src/uicu/segment.py:10:49: F401 `uicu.exceptions.OperationError` imported but unused
+   |
+ 8 | import icu
+ 9 |
+10 | from uicu.exceptions import ConfigurationError, OperationError
+   |                                                 ^^^^^^^^^^^^^^ F401
+11 | from uicu.locale import Locale
+   |
+   = help: Remove unused import
+
+src/uicu/translit.py:11:49: F401 `uicu.exceptions.OperationError` imported but unused
+   |
+ 9 | import icu
+10 |
+11 | from uicu.exceptions import ConfigurationError, OperationError
+   |                                                 ^^^^^^^^^^^^^^ F401
+12 | from uicu.locale import Locale
+   |
+   = help: Remove unused import: `uicu.exceptions.OperationError`
+
+src/uicu/translit.py:12:25: F401 `uicu.locale.Locale` imported but unused
+   |
+11 | from uicu.exceptions import ConfigurationError, OperationError
+12 | from uicu.locale import Locale
+   |                         ^^^^^^ F401
+   |
+   = help: Remove unused import: `uicu.locale.Locale`
+
+tests/test_char.py:37:36: RUF001 String contains ambiguous `١` (ARABIC-INDIC DIGIT ONE). Did you mean `l` (LATIN SMALL LETTER L)?
+   |
+35 |         assert uicu.bidirectional("A") == "L"  # Left-to-right
+36 |         assert uicu.bidirectional("א") == "R"  # Right-to-left (Hebrew)
+37 |         assert uicu.bidirectional("١") == "AN"  # Arabic number
+   |                                    ^ RUF001
+38 |
+39 |     def test_combining(self):
+   |
+
+Found 26 errors (1 fixed, 25 remaining).
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+Othello:uicu adam$ 

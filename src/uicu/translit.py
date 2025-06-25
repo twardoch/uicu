@@ -8,7 +8,7 @@ enabling script conversion and various text transformations.
 
 import icu
 
-from uicu.exceptions import ConfigurationError, OperationError
+from uicu.exceptions import ConfigurationError
 
 
 class Transliterator:

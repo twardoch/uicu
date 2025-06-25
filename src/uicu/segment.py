@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 # this_file: src/uicu/segment.py
 # pyright: ignore
-"""Text boundary analysis (graphemes, words, sentences).
-
-This module provides Pythonic interfaces for ICU's break iteration functionality,
-enabling text segmentation according to Unicode rules and locale conventions.
-"""
+"""Text segmentation functionality."""
 
 from collections.abc import Iterator
 
 import icu
 
-from uicu.exceptions import ConfigurationError, OperationError
+from uicu._utils import ensure_locale
 from uicu.locale import Locale
+
+# from uicu.exceptions import ConfigurationError  # Currently unused
 
 
 def _create_break_iterator(
@@ -108,8 +106,7 @@ def graphemes(text: str, locale: str | Locale | None = None) -> Iterator[str]:
         ['न', 'म', 'स्', 'ते']  # Note combined characters
     """
     # Convert string locale to Locale object if needed
-    if isinstance(locale, str):
-        locale = Locale(locale)
+    locale = ensure_locale(locale)
 
     # Create character (grapheme) break iterator
     break_iterator = _create_break_iterator("character", locale)
@@ -147,8 +144,7 @@ def words(
         ['你好', '世界']  # Chinese word segmentation
     """
     # Convert string locale to Locale object if needed
-    if isinstance(locale, str):
-        locale = Locale(locale)
+    locale = ensure_locale(locale)
 
     # Create word break iterator
     break_iterator = _create_break_iterator("word", locale)
@@ -181,8 +177,7 @@ def sentences(text: str, locale: str | Locale | None = None) -> Iterator[str]:
         ['Hello. ', 'How are you? ', "I'm fine!"]
     """
     # Convert string locale to Locale object if needed
-    if isinstance(locale, str):
-        locale = Locale(locale)
+    locale = ensure_locale(locale)
 
     # Create sentence break iterator
     break_iterator = _create_break_iterator("sentence", locale)
@@ -205,8 +200,7 @@ def lines(text: str, locale: str | Locale | None = None) -> Iterator[str]:
         Text segments between line break opportunities.
     """
     # Convert string locale to Locale object if needed
-    if isinstance(locale, str):
-        locale = Locale(locale)
+    locale = ensure_locale(locale)
 
     # Create line break iterator
     break_iterator = _create_break_iterator("line", locale)
@@ -229,8 +223,7 @@ def line_breaks(text: str, locale: str | Locale | None = None) -> Iterator[int]:
         Character positions where line breaks are allowed.
     """
     # Convert string locale to Locale object if needed
-    if isinstance(locale, str):
-        locale = Locale(locale)
+    locale = ensure_locale(locale)
 
     # Create line break iterator
     break_iterator = _create_break_iterator("line", locale)
@@ -263,8 +256,7 @@ class BaseSegmenter:
         Args:
             locale: Optional locale for locale-specific rules.
         """
-        if isinstance(locale, str):
-            locale = Locale(locale)
+        locale = ensure_locale(locale) if locale is not None else locale
         self._locale = locale
         self._break_iterator = self._create_break_iterator()
 

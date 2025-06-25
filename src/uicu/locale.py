@@ -7,7 +7,9 @@ and serves as a factory for creating locale-aware services like collators,
 formatters, and segmenters.
 """
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import icu
 
@@ -15,12 +17,8 @@ from uicu.exceptions import ConfigurationError
 
 # Type hints for forward references
 if TYPE_CHECKING:
-    # from uicu.format import (
-    #     DateTimeFormatter,
-    #     ListFormatter,
-    #     NumberFormatter,
-    # )
     from uicu.collate import Collator
+    from uicu.format import DateTimeFormatter
     from uicu.segment import (
         GraphemeSegmenter,
         SentenceSegmenter,
@@ -35,26 +33,22 @@ class Locale:
     for creating various locale-aware services.
     """
 
-    def __init__(self, identifier: str):
-        """Create locale from BCP 47 identifier (e.g., 'en-GB', 'zh-Hant-TW').
-        
-        Accepts both hyphen and underscore as separator.
+    def __init__(self, language_tag: str):
+        """Initialize a locale.
+
+        Args:
+            language_tag: BCP 47 language tag (e.g. 'en-US', 'fr-FR')
+
+        Raises:
+            ConfigurationError: If locale creation fails
         """
-        # Normalize identifier (BCP 47 uses hyphens, ICU accepts underscores)
-        identifier = identifier.replace("-", "_")
-
         try:
-            # Use createCanonical to validate and normalize
-            self._icu_locale = icu.Locale.createCanonical(identifier)
-
-            # Check if locale is valid by checking for language
-            if not self._icu_locale.getLanguage():
-                msg = f"Invalid locale identifier: {identifier}"
-                raise ConfigurationError(msg)
-
+            self._icu_locale = icu.Locale(language_tag)
         except Exception as e:
-            msg = f"Failed to create locale '{identifier}': {e}"
+            msg = f"Failed to create locale for '{language_tag}': {e}"
             raise ConfigurationError(msg) from e
+
+        self._language_tag = language_tag
 
         # Cache commonly accessed properties
         self._language = self._icu_locale.getLanguage()
@@ -72,7 +66,7 @@ class Locale:
         # Get display name in the default locale
         return self._icu_locale.getDisplayName()
 
-    def get_display_name_in_locale(self, display_locale: Optional["Locale"] = None) -> str:
+    def get_display_name_in_locale(self, display_locale: Locale | None = None) -> str:
         """Get display name in a specific locale.
 
         Args:
@@ -119,8 +113,7 @@ class Locale:
 
     @property
     def base_name(self) -> str:
-        """The canonical locale identifier (e.g., 'en_GB', 'zh_Hant_TW').
-        """
+        """The canonical locale identifier (e.g., 'en_GB', 'zh_Hant_TW')."""
         return self._icu_locale.getBaseName()
 
     @property
@@ -134,19 +127,21 @@ class Locale:
 
     # Factory methods for locale-aware services
 
-    def get_collator(self, strength: str = "tertiary", numeric: bool = False, **kwargs) -> "Collator":
+    def get_collator(self, strength: str = "tertiary", *, numeric: bool = False, **kwargs) -> Collator:
         """Create a collator for this locale.
 
         Args:
-            strength: Comparison strength - 'primary', 'secondary',
-                     'tertiary', 'quaternary', or 'identical'.
-            numeric: Enable numeric sorting (2 < 10).
-            **kwargs: Additional options passed to Collator.
+            strength: The collation strength level. One of:
+                - "primary" - Base characters only
+                - "secondary" - Base + accents
+                - "tertiary" - Base + accents + case (default)
+                - "quaternary" - Base + accents + case + punctuation
+            numeric: Whether to use numeric collation
+            **kwargs: Additional collation options
 
         Returns:
-            A configured Collator instance.
+            A collator for this locale
         """
-        # Import here to avoid circular imports
         from uicu.collate import Collator
 
         return Collator(self, strength=strength, numeric=numeric, **kwargs)
@@ -156,18 +151,17 @@ class Locale:
         date_style: str = "medium",
         time_style: str = "medium",
         **kwargs,
-    ) -> "DateTimeFormatter":
+    ) -> DateTimeFormatter:
         """Create a date/time formatter for this locale.
 
         Args:
-            date_style: Date format style - 'full', 'long', 'medium', 'short', 'none'.
-            time_style: Time format style - 'full', 'long', 'medium', 'short', 'none'.
-            **kwargs: Additional options passed to DateTimeFormatter.
+            date_style: Date format style ('none', 'short', 'medium', 'long', 'full')
+            time_style: Time format style ('none', 'short', 'medium', 'long', 'full')
+            **kwargs: Additional formatter options
 
         Returns:
-            A configured DateTimeFormatter instance.
+            A date/time formatter for this locale
         """
-        # Import here to avoid circular imports
         from uicu.format import DateTimeFormatter
 
         return DateTimeFormatter(
@@ -181,41 +175,33 @@ class Locale:
         self,
         style: str = "medium",
         **kwargs,
-    ) -> "DateTimeFormatter":
+    ) -> DateTimeFormatter:
         """Create a date-only formatter for this locale.
 
         Args:
-            style: Format style - 'full', 'long', 'medium', 'short'.
-            **kwargs: Additional options passed to DateTimeFormatter.
+            style: Date format style ('short', 'medium', 'long', 'full')
+            **kwargs: Additional formatter options
 
         Returns:
-            A configured DateTimeFormatter instance.
+            A date-only formatter for this locale
         """
-        return self.get_datetime_formatter(
-            date_style=style,
-            time_style="none",
-            **kwargs,
-        )
+        return self.get_datetime_formatter(date_style=style, time_style="none", **kwargs)
 
     def get_time_formatter(
         self,
         style: str = "medium",
         **kwargs,
-    ) -> "DateTimeFormatter":
+    ) -> DateTimeFormatter:
         """Create a time-only formatter for this locale.
 
         Args:
-            style: Format style - 'full', 'long', 'medium', 'short'.
-            **kwargs: Additional options passed to DateTimeFormatter.
+            style: Time format style ('short', 'medium', 'long', 'full')
+            **kwargs: Additional formatter options
 
         Returns:
-            A configured DateTimeFormatter instance.
+            A time-only formatter for this locale
         """
-        return self.get_datetime_formatter(
-            date_style="none",
-            time_style=style,
-            **kwargs,
-        )
+        return self.get_datetime_formatter(date_style="none", time_style=style, **kwargs)
 
     #
     # def get_number_formatter(
@@ -261,33 +247,33 @@ class Locale:
     #         **kwargs,
     #     )
 
-    def get_word_segmenter(self) -> "WordSegmenter":
+    def get_word_segmenter(self) -> WordSegmenter:
         """Create a word segmenter for this locale.
 
         Returns:
-            A configured WordSegmenter instance.
+            A new WordSegmenter instance for this locale
         """
         # Import here to avoid circular imports
         from uicu.segment import WordSegmenter
 
         return WordSegmenter(self)
 
-    def get_grapheme_segmenter(self) -> "GraphemeSegmenter":
+    def get_grapheme_segmenter(self) -> GraphemeSegmenter:
         """Create a grapheme segmenter for this locale.
 
         Returns:
-            A configured GraphemeSegmenter instance.
+            A new GraphemeSegmenter instance for this locale
         """
         # Import here to avoid circular imports
         from uicu.segment import GraphemeSegmenter
 
         return GraphemeSegmenter(self)
 
-    def get_sentence_segmenter(self) -> "SentenceSegmenter":
+    def get_sentence_segmenter(self) -> SentenceSegmenter:
         """Create a sentence segmenter for this locale.
 
         Returns:
-            A configured SentenceSegmenter instance.
+            A new SentenceSegmenter instance for this locale
         """
         # Import here to avoid circular imports
         from uicu.segment import SentenceSegmenter

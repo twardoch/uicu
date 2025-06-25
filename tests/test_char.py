@@ -34,7 +34,7 @@ class TestCharacterProperties:
         """Test bidirectional class."""
         assert uicu.bidirectional("A") == "L"  # Left-to-right
         assert uicu.bidirectional("א") == "R"  # Right-to-left (Hebrew)
-        assert uicu.bidirectional("١") == "AN"  # Arabic number
+        assert uicu.bidirectional("١") == "AN"  # Arabic-Indic digit (intentional)  # noqa: RUF001
 
     def test_combining(self):
         """Test combining class."""

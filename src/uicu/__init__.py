@@ -35,7 +35,6 @@ from uicu.char import (
 from uicu.collate import Collator, compare, sort
 from uicu.exceptions import (
     ConfigurationError,
-    OperationError,
     UICUError,
 )
 from uicu.locale import Locale, get_available_locales, get_default_locale
@@ -113,31 +112,23 @@ def detect_script(text: str) -> str | None:
 
 # Define what's exported with "from uicu import *"
 __all__ = [
-    # Character properties
     "Char",
-    # Exceptions
     "CollationError",
-    # Collation
     "Collator",
     "ConfigurationError",
-    # Formatting
     "DateTimeFormatter",
     "FormattingError",
-    "ListFormatter",
-    "NumberFormatter",
-    # Segmentation
     "GraphemeSegmenter",
     "LineSegmenter",
-    # Locale
+    "ListFormatter",
     "Locale",
+    "NumberFormatter",
     "SegmentationError",
     "SentenceSegmenter",
     "TransliterationError",
-    # Transliteration
     "Transliterator",
     "UICUError",
     "WordSegmenter",
-    # Version
     "__version__",
     "bidirectional",
     "block",
