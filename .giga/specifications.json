@@ -1,0 +1,18 @@
+[
+  {
+    "fileName": "main-overview.mdc",
+    "description": "High-level overview of the uicu system architecture, core components, and integration with PyICU and fontTools.unicodedata"
+  },
+  {
+    "fileName": "unicode-wrapper-implementation.mdc",
+    "description": "Detailed documentation of the Pythonic wrapper implementation around PyICU, including class hierarchies, method signatures, and Unicode handling algorithms"
+  },
+  {
+    "fileName": "data-models.mdc",
+    "description": "Documentation of core data structures and models used to represent Unicode data, including relationships between PyICU objects and Python native types"
+  },
+  {
+    "fileName": "data-flow.mdc",
+    "description": "Documentation of how Unicode data flows through the system, including processing pipelines, transformations, and integration points between PyICU and fontTools.unicodedata"
+  }
+]
