@@ -15,6 +15,7 @@ from uicu._utils import ensure_locale
 from uicu.exceptions import OperationError
 from uicu.locale import Locale
 
+
 class DateTimeFormatter:
     """Formats datetime objects according to locale conventions.
 

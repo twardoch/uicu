@@ -1,0 +1,82 @@
+Othello:uicu adam$ ./build.sh
+Usage: ./build.sh <command>
+
+Commands:
+  deps         Install/update dev dependencies (uv, hatch)
+  lint         Run Ruff linting and formatting checks
+  format       Run Ruff formatter and autofixes
+  type-check   Run mypy static type checking
+  test         Run pytest test suite
+  test-cov     Run tests with coverage report
+  build        Build wheel and sdist using Hatch
+  docs         Build Sphinx HTML documentation
+  clean        Remove build artefacts (build/, dist/, *.egg-info …)
+  llms         Regenerate llms.txt using repomix (requires Node + npx)
+  all          Run deps → format → lint → type-check → test-cov → build
+  help         Show this help message
+Othello:uicu adam$ ./build.sh all
+cmd [1] | ruff format --respect-gitignore src/uicu tests
+2 files reformatted, 14 files left unchanged
+cmd [2] | ruff check --fix src/uicu tests
+src/uicu/_utils.py:31:9: PLC0415 `import` should be at the top-level of a file
+   |
+29 |     if isinstance(locale, str):
+30 |         # Import here to avoid circular imports
+31 |         from uicu.locale import Locale
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+32 |
+33 |         return Locale(locale)
+   |
+
+src/uicu/locale.py:145:9: PLC0415 `import` should be at the top-level of a file
+    |
+143 |             A collator for this locale
+144 |         """
+145 |         from uicu.collate import Collator
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+146 |
+147 |         return Collator(self, strength=strength, numeric=numeric, **kwargs)
+    |
+
+src/uicu/locale.py:165:9: PLC0415 `import` should be at the top-level of a file
+    |
+163 |             A date/time formatter for this locale
+164 |         """
+165 |         from uicu.format import DateTimeFormatter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+166 |
+167 |         return DateTimeFormatter(
+    |
+
+src/uicu/locale.py:257:9: PLC0415 `import` should be at the top-level of a file
+    |
+255 |         """
+256 |         # Import here to avoid circular imports
+257 |         from uicu.segment import WordSegmenter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+258 |
+259 |         return WordSegmenter(self)
+    |
+
+src/uicu/locale.py:268:9: PLC0415 `import` should be at the top-level of a file
+    |
+266 |         """
+267 |         # Import here to avoid circular imports
+268 |         from uicu.segment import GraphemeSegmenter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+269 |
+270 |         return GraphemeSegmenter(self)
+    |
+
+src/uicu/locale.py:279:9: PLC0415 `import` should be at the top-level of a file
+    |
+277 |         """
+278 |         # Import here to avoid circular imports
+279 |         from uicu.segment import SentenceSegmenter
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLC0415
+280 |
+281 |         return SentenceSegmenter(self)
+    |
+
+Found 6 errors.
+Othello:uicu adam$ 

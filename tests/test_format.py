@@ -86,7 +86,6 @@ class TestDateTimeFormatter:
         assert "2025" in result
         assert "3:30" in result or "15:30" in result
 
-
     def test_format_range(self):
         """Test date range formatting."""
         formatter = uicu.DateTimeFormatter("en-US", date_style="medium", time_style="none")

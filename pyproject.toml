@@ -382,7 +382,7 @@ select = [
     'ISC', # flake8-implicit-str-concat: checks for implicit string concatenation
     'LOG', # flake8-logging: checks for logging issues
     'N', # pep8-naming: checks naming conventions
-    'PLC', # pylint convention: checks for convention issues
+    # 'PLC', # pylint convention: checks for convention issues - DISABLED due to PLC0415 circular import errors
     'PLE', # pylint error: checks for errors
     'PLR', # pylint refactor: suggests refactors
     'PLW', # pylint warning: checks for suspicious code
@@ -447,4 +447,8 @@ ban-relative-imports = 'all' # Ban all relative imports for consistency
     'S101', # Allow assertions in tests
     'TID252'
     # Allow relative imports in tests for convenience
+]
+# Allow module shadowing for locale module (intentional naming)
+'src/uicu/locale.py' = [
+    'A005', # Module shadows Python builtin - intentional for domain-specific locale handling
 ]
