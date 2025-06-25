@@ -1,14 +1,20 @@
 #!/usr/bin/env python
-# this_file: src/uicu/segment.py
-# pyright: ignore
-"""Text segmentation functionality."""
+from __future__ import annotations
 
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import icu
 
 from uicu._utils import ensure_locale
-from uicu.locale import Locale
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from uicu.locale import Locale
+
+# this_file: src/uicu/segment.py
+# pyright: ignore
+"""Text segmentation functionality."""
 
 # from uicu.exceptions import ConfigurationError  # Currently unused
 
@@ -106,10 +112,10 @@ def graphemes(text: str, locale: str | Locale | None = None) -> Iterator[str]:
         ['न', 'म', 'स्', 'ते']  # Note combined characters
     """
     # Convert string locale to Locale object if needed
-    locale = ensure_locale(locale)
+    locale_obj = ensure_locale(locale) if locale is not None else None
 
     # Create character (grapheme) break iterator
-    break_iterator = _create_break_iterator("character", locale)
+    break_iterator = _create_break_iterator("character", locale_obj)
 
     # Iterate over grapheme clusters
     yield from _iterate_breaks(text, break_iterator)
@@ -144,10 +150,10 @@ def words(
         ['你好', '世界']  # Chinese word segmentation
     """
     # Convert string locale to Locale object if needed
-    locale = ensure_locale(locale)
+    locale_obj = ensure_locale(locale) if locale is not None else None
 
     # Create word break iterator
-    break_iterator = _create_break_iterator("word", locale)
+    break_iterator = _create_break_iterator("word", locale_obj)
 
     # Iterate over words
     for word in _iterate_breaks(text, break_iterator):
@@ -177,10 +183,10 @@ def sentences(text: str, locale: str | Locale | None = None) -> Iterator[str]:
         ['Hello. ', 'How are you? ', "I'm fine!"]
     """
     # Convert string locale to Locale object if needed
-    locale = ensure_locale(locale)
+    locale_obj = ensure_locale(locale) if locale is not None else None
 
     # Create sentence break iterator
-    break_iterator = _create_break_iterator("sentence", locale)
+    break_iterator = _create_break_iterator("sentence", locale_obj)
 
     # Iterate over sentences
     yield from _iterate_breaks(text, break_iterator)
@@ -200,10 +206,10 @@ def lines(text: str, locale: str | Locale | None = None) -> Iterator[str]:
         Text segments between line break opportunities.
     """
     # Convert string locale to Locale object if needed
-    locale = ensure_locale(locale)
+    locale_obj = ensure_locale(locale) if locale is not None else None
 
     # Create line break iterator
-    break_iterator = _create_break_iterator("line", locale)
+    break_iterator = _create_break_iterator("line", locale_obj)
 
     # Iterate over line segments
     yield from _iterate_breaks(text, break_iterator)
@@ -223,10 +229,10 @@ def line_breaks(text: str, locale: str | Locale | None = None) -> Iterator[int]:
         Character positions where line breaks are allowed.
     """
     # Convert string locale to Locale object if needed
-    locale = ensure_locale(locale)
+    locale_obj = ensure_locale(locale) if locale is not None else None
 
     # Create line break iterator
-    break_iterator = _create_break_iterator("line", locale)
+    break_iterator = _create_break_iterator("line", locale_obj)
 
     # Set text
     uset = icu.UnicodeString(text)

@@ -1,17 +1,11 @@
 #!/usr/bin/env python
-# this_file: src/uicu/__init__.py
-"""uicu - A Pythonic wrapper for PyICU.
-
-This package provides natural, Pythonic interfaces to ICU's powerful
-internationalization and Unicode capabilities, making advanced text
-processing accessible to Python developers.
-"""
+from __future__ import annotations
 
 # Version information
 try:
     from uicu._version import __version__  # type: ignore
 except ImportError:
-    __version__ = "0.0.1dev"
+    __version__ = "1.0.0a1"
 
 # Import main components for convenient access
 from uicu.char import (
@@ -35,6 +29,7 @@ from uicu.char import (
 from uicu.collate import Collator, compare, sort
 from uicu.exceptions import (
     ConfigurationError,
+    OperationError,
     UICUError,
 )
 from uicu.locale import Locale, get_available_locales, get_default_locale
@@ -60,12 +55,10 @@ from uicu.translit import (
 
 # Import formatting components
 try:
-    from uicu.format import DateTimeFormatter, ListFormatter, NumberFormatter
+    from uicu.format import DateTimeFormatter
 except ImportError:
     # Format module not yet fully implemented
     DateTimeFormatter = None
-    ListFormatter = None
-    NumberFormatter = None
 
 # Import script detection dependencies at module level
 try:
@@ -110,6 +103,14 @@ def detect_script(text: str) -> str | None:
         return None
 
 
+# this_file: src/uicu/__init__.py
+"""uicu - A Pythonic wrapper for PyICU.
+
+This package provides natural, Pythonic interfaces to ICU's powerful
+internationalization and Unicode capabilities, making advanced text
+processing accessible to Python developers.
+"""
+
 # Define what's exported with "from uicu import *"
 __all__ = [
     "Char",
@@ -120,9 +121,8 @@ __all__ = [
     "FormattingError",
     "GraphemeSegmenter",
     "LineSegmenter",
-    "ListFormatter",
     "Locale",
-    "NumberFormatter",
+    "OperationError",
     "SegmentationError",
     "SentenceSegmenter",
     "TransliterationError",

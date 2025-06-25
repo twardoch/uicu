@@ -1,14 +1,16 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
+import icu
+
+from uicu.exceptions import ConfigurationError
+
 # this_file: src/uicu/translit.py
 """Script conversion and text transforms.
 
 This module provides Pythonic interfaces for ICU's transliteration functionality,
 enabling script conversion and various text transformations.
 """
-
-import icu
-
-from uicu.exceptions import ConfigurationError
 
 
 class Transliterator:
@@ -37,8 +39,12 @@ class Transliterator:
             msg = f"Invalid direction '{direction}'. Must be 'forward' or 'reverse'."
             raise ConfigurationError(msg)
 
-        # Create ICU transliterator - let ICU errors propagate
-        self._transliterator = icu.Transliterator.createInstance(transform_id, icu_direction)
+        # Create ICU transliterator - wrap ICU errors
+        try:
+            self._transliterator = icu.Transliterator.createInstance(transform_id, icu_direction)
+        except icu.ICUError as e:
+            msg = f"Failed to create transliterator for '{transform_id}': {e}"
+            raise ConfigurationError(msg) from e
 
         # Store configuration
         self._transform_id = transform_id
@@ -79,7 +85,7 @@ class Transliterator:
         """
         return self.transliterate(text)
 
-    def inverse(self) -> "Transliterator":
+    def inverse(self) -> Transliterator:
         """Return inverse transliterator.
 
         Returns:
@@ -101,7 +107,7 @@ class Transliterator:
         return new_instance
 
     @classmethod
-    def from_rules(cls, name: str, rules: str, direction: str = "forward") -> "Transliterator":
+    def from_rules(cls, name: str, rules: str, direction: str = "forward") -> Transliterator:
         """Create transliterator from custom rules.
 
         Args:
@@ -195,7 +201,7 @@ class Transliterator:
         except Exception:
             return False
 
-    def get_inverse(self) -> "Transliterator":
+    def get_inverse(self) -> Transliterator:
         """Get the inverse transliterator.
 
         This is an alias for the inverse() method.

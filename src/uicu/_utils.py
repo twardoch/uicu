@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# this_file: src/uicu/_utils.py
-"""Internal utilities for uicu package.
-
-This module contains shared utility functions used internally by uicu modules.
-These functions are private to the package and not part of the public API.
-"""
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uicu.locale import Locale
+
+# this_file: src/uicu/_utils.py
+"""Internal utilities for uicu package.
+
+This module contains shared utility functions used internally by uicu modules.
+These functions are private to the package and not part of the public API.
+"""
 
 
 def ensure_locale(locale: str | Locale) -> Locale:
@@ -26,9 +26,11 @@ def ensure_locale(locale: str | Locale) -> Locale:
     Raises:
         ICU errors if locale string is invalid.
     """
-    if isinstance(locale, str):
-        # Import here to avoid circular imports
-        from uicu.locale import Locale
+    # Use duck typing instead of isinstance to avoid circular imports
+    if hasattr(locale, "language_tag"):
+        return locale  # Already a Locale object
 
-        return Locale(locale)
-    return locale
+    # Import here is safe since we're in a utility module
+    from uicu.locale import Locale
+
+    return Locale(locale)

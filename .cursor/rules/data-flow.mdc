@@ -1,53 +1,73 @@
 ---
-description: Documents Unicode data processing flows, transformations and integration points between PyICU and fontTools.unicodedata
-globs: src/uicu/**/*.py,tests/**/*_test.py
+description: Analyze Unicode data transformation pipelines and integration points between text processing systems
+globs: src/uicu/*.py,tests/*.py
 alwaysApply: false
 ---
 
 
-# data-flow
+# Data-Flow
 
-## Core Unicode Data Pipeline
+## Unicode Processing Pipeline
 
-1. **PyICU Integration Layer**
-- Wraps PyICU's Unicode processing capabilities into a Pythonic interface
-- Handles raw Unicode data input from PyICU API
-- Transforms data into Python native Unicode objects
-- File: `src/uicu/pyicu_wrapper.py`
+The system implements a multi-stage Unicode data transformation pipeline:
 
-2. **FontTools Data Enrichment**
-- Augments Unicode data with writing system information from fontTools.unicodedata
-- Merges supplementary Unicode properties into the data stream
-- File: `src/uicu/font_tools_bridge.py`
+1. Input Processing
+```python
+# src/uicu/char.py
+def process_unicode_input(text: str):
+    # Combines fontTools.unicodedata and PyICU data streams
+    # Routes character data through property extraction pipeline
+```
 
-3. **Unified Data Model**
-- Combines data from both sources into cohesive Unicode objects 
-- Maintains relationship between original PyICU data and enriched properties
-- File: `src/uicu/models.py`
+2. Data Source Integration 
+```python
+# src/uicu/uicu.py
+class UnicodeDataBridge:
+    def get_combined_properties(self, char):
+        # Merges Unicode property streams from:
+        # - PyICU character database
+        # - fontTools.unicodedata supplementary data
+        # Returns enriched character metadata
+```
 
-## Data Transformation Flows
+3. Script Analysis Pipeline
+```python 
+# src/uicu/scripts.py
+def analyze_writing_system(text):
+    # Processes text through parallel analysis:
+    # 1. PyICU script detection
+    # 2. fontTools writing system classification
+    # 3. Combines results for enhanced script info
+```
 
-1. **Unicode Normalization Pipeline**
-- Processes incoming Unicode through configurable normalization forms
-- Integrates PyICU normalization with Python's unicodedata
-- File: `src/uicu/normalizer.py`
+4. Property Transformation Chain
+```python
+# src/uicu/properties.py
+class PropertyTransformer:
+    def transform_stream(self, char_stream):
+        # Routes character properties through:
+        # 1. Basic property extraction
+        # 2. Writing system enrichment
+        # 3. Script-specific transforms
+        # 4. Final property normalization
+```
 
-2. **Writing System Analysis**
-- Extracts writing system metadata from fontTools
-- Associates script information with Unicode code points
-- File: `src/uicu/writing_systems.py`
+## Key Data Integration Points
 
-## Integration Points
+1. PyICU → fontTools Bridge
+- Location: src/uicu/bridge.py
+- Purpose: Synchronizes Unicode data between systems
+- Flow: PyICU → Data Normalization → fontTools Format → Combined Output
 
-1. **PyICU Bridge** 
-- Direct interface to ICU Unicode processing
-- Handles data format conversions between PyICU and Python
-- File: `src/uicu/icu_bridge.py`
+2. Property Extraction Pipeline
+- Location: src/uicu/extract.py  
+- Purpose: Extracts and combines character properties
+- Flow: Input → PyICU Properties → fontTools Properties → Merged Result
 
-2. **FontTools Connector**
-- Manages access to supplementary Unicode data
-- Synchronizes property lookups between systems
-- File: `src/uicu/font_tools.py`
+3. Script Classification System
+- Location: src/uicu/classify.py
+- Purpose: Multi-source script detection
+- Flow: Text → Parallel Analysis → Combined Classification
 
 $END$
 

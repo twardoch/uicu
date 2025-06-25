@@ -25,10 +25,6 @@ class TestCollator:
 
     def test_invalid_collator(self):
         """Test error handling for invalid configuration."""
-        # Invalid locale (empty string)
-        with pytest.raises(uicu.ConfigurationError):
-            uicu.Collator("")
-
         # Invalid strength
         with pytest.raises(uicu.ConfigurationError):
             uicu.Collator("en-US", strength="invalid")

@@ -1,18 +1,24 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import icu
+
+from uicu._utils import ensure_locale
+from uicu.exceptions import ConfigurationError
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from uicu.locale import Locale
+
 # this_file: src/uicu/collate.py
 """Locale-aware string comparison and sorting.
 
 This module provides Pythonic interfaces for ICU's collation functionality,
 enabling locale-sensitive string comparison and sorting.
 """
-
-from collections.abc import Iterable
-
-import icu
-
-from uicu._utils import ensure_locale
-from uicu.exceptions import ConfigurationError
-from uicu.locale import Locale
 
 # Map string strength names to ICU constants
 STRENGTH_MAP = {

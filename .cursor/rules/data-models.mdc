@@ -1,58 +1,78 @@
 ---
-description: Defines core data structures and models for Unicode data handling and Python type relationships
-globs: src/uicu/*.py,tests/**/test_models.py,tests/**/test_data.py
+description: Specification for core data structures and models used to represent Unicode data in the uICU project
+globs: src/uicu/*.py,tests/**/test_*_data*.py,src/uicu/models/*.py
 alwaysApply: false
 ---
 
 
 # data-models
 
-## Core Data Models (Importance: 95)
+## Core Unicode Data Models
 
-The data model architecture centers around representing and transforming Unicode data between PyICU objects and Python native types:
+### Character Property Model
+Path: src/uicu/char.py
+Importance: 95
 
-1. **Unicode Data Representation**
-- Custom data structures for Unicode character properties
-- Mappings between PyICU Unicode database entries and Python string types
-- Integration with fontTools.unicodedata writing system information
-File: `src/uicu/models.py`
-
-2. **Type Relationships** 
-- Data models defining bidirectional conversion between:
-  - PyICU UChar objects
-  - Python str/bytes types
-  - Writing system metadata from fontTools
-- Cross-reference tables for character properties
-File: `src/uicu/types.py`
-
-## Object Model Hierarchy (Importance: 85)
-
-Core class hierarchy for Unicode data abstraction:
+Data structures for representing Unicode character properties with rich metadata:
 
 ```python
-class UnicodeData:
-    """Base class for Unicode character data"""
-    # Maps to PyICU character database
-
-class WritingSystemData:
-    """Writing system metadata"""  
-    # Integrates fontTools script information
+class UnicodeChar:
+    codepoint: int
+    category: str 
+    script: str
+    bidi_class: str
+    numeric_value: Optional[decimal.Decimal]
+    decomposition: List[int]
+    writing_system: Optional[str]  # From fontTools
 ```
 
-File: `src/uicu/models.py`
+### Script Classification Model
+Path: src/uicu/models/scripts.py 
+Importance: 90
 
-## Model Relationships (Importance: 80)
+Hierarchical representation of writing systems:
+```python
+class Script:
+    code: str  # ISO 15924 code
+    name: str
+    family: Optional[str]  # Writing system family
+    extensions: List[str]  # Script extensions
+    aliases: List[str]  # Alternative script names
+```
 
-The data models maintain bidirectional relationships between:
+### Locale Data Model
+Path: src/uicu/locale.py
+Importance: 85
 
-- PyICU's native character database structures
-- Python's built-in Unicode string handling
-- fontTools writing system metadata
-- Custom property mappings and cross-references
+Language and region structures:
+```python
+class LocaleData:
+    language: str  # ISO 639 code
+    script: Optional[str]  # ISO 15924 code
+    region: Optional[str]  # ISO 3166 code
+    variants: List[str]
+    extensions: Dict[str, str]
+```
 
-These relationships enable seamless conversion while preserving Unicode data integrity.
+### Transliteration Rules Model
+Path: src/uicu/translit.py
+Importance: 80
 
-File: `src/uicu/relationships.py`
+Data structures for character mapping rules:
+```python
+class TranslitRule:
+    source_chars: Set[int]  # Source codepoints
+    target_chars: Set[int]  # Target codepoints
+    context_before: Optional[str]
+    context_after: Optional[str]
+    filters: List[Callable]
+```
+
+Key relationships:
+- UnicodeChar integrates data from both PyICU and fontTools sources 
+- Script classifications inherit from ISO 15924 with additional metadata
+- LocaleData follows BCP 47 structure with extensions
+- TranslitRule defines bidirectional character mappings
 
 $END$
 

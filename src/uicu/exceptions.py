@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
 # this_file: src/uicu/exceptions.py
 """Exception hierarchy for the uicu package."""
 

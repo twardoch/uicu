@@ -1,12 +1,4 @@
 #!/usr/bin/env python
-# this_file: src/uicu/locale.py
-"""Locale management and factory for locale-aware services.
-
-This module provides the central Locale class that represents a specific locale
-and serves as a factory for creating locale-aware services like collators,
-formatters, and segmenters.
-"""
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -24,6 +16,14 @@ if TYPE_CHECKING:
         SentenceSegmenter,
         WordSegmenter,
     )
+
+# this_file: src/uicu/locale.py
+"""Locale management and factory for locale-aware services.
+
+This module provides the central Locale class that represents a specific locale
+and serves as a factory for creating locale-aware services like collators,
+formatters, and segmenters.
+"""
 
 
 class Locale:

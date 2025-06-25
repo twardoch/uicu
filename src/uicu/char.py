@@ -1,16 +1,5 @@
 #!/usr/bin/env python
-# this_file: src/uicu/char.py
-"""Unicode character properties module.
-
-This module provides Pythonic access to Unicode character information using
-the latest Unicode data from fontTools.unicodedata with fallback to Python's
-built-in unicodedata module.
-
-Note: This module analyzes individual Unicode codepoints. Multi-codepoint
-grapheme clusters (like flag emojis) should be broken into individual
-codepoints for analysis. Use the uicu.segment module for grapheme-aware
-text processing.
-"""
+from __future__ import annotations
 
 import unicodedata
 from typing import Any
@@ -29,6 +18,19 @@ except ImportError:
         ImportWarning,
         stacklevel=2,
     )
+
+# this_file: src/uicu/char.py
+"""Unicode character properties module.
+
+This module provides Pythonic access to Unicode character information using
+the latest Unicode data from fontTools.unicodedata with fallback to Python's
+built-in unicodedata module.
+
+Note: This module analyzes individual Unicode codepoints. Multi-codepoint
+grapheme clusters (like flag emojis) should be broken into individual
+codepoints for analysis. Use the uicu.segment module for grapheme-aware
+text processing.
+"""
 
 
 def _normalize_char_input(char: str | int) -> str:

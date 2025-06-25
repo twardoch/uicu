@@ -1,59 +1,65 @@
 ---
-description: Specifies the implementation of the Pythonic Unicode wrapper functionality around PyICU and fontTools.unicodedata
-globs: src/uicu/*.py,tests/*_unicode*.py,tests/*_icu*.py
+description: Guides implementation of Pythonic wrapper classes and methods for Unicode data processing via PyICU and fontTools
+globs: src/uicu/*.py,src/uicu/unicode/*.py,src/uicu/char/*.py
 alwaysApply: false
 ---
 
 
 # unicode-wrapper-implementation
 
-### Core Unicode Wrapper Components
+## Core Wrapper Components 
 
-1. **PyICU Integration Layer** (Importance: 95)
-- Custom wrapper classes that provide Pythonic interfaces to PyICU's Unicode operations
-- Handles encoding/decoding between Python's native Unicode and ICU's internal formats
-- File path: `src/uicu/icu_wrapper.py`
+1. Character Property Facade (Importance: 95)
+```python
+class UnicodeChar:
+    """Provides unified access to character properties across ICU and fontTools"""
+    def get_properties(self):
+        # Combines data from both sources with fontTools as primary
+        # Falls back to ICU for missing properties
+```
 
-2. **fontTools Integration** (Importance: 85)
-- Supplementary writing system information extraction from fontTools.unicodedata
-- Merges font-specific Unicode data with ICU capabilities
-- File path: `src/uicu/font_unicode.py`
+2. Script Detection System (Importance: 90)
+```python
+class ScriptDetector:
+    def detect_scripts(self, text):
+        # Filters common/inherited scripts
+        # Returns ISO 15924 codes with extensions
+        # Handles mixed-script content
+```
 
-3. **Unicode Data Objects** (Importance: 90)
-- Rich object model representing Unicode characters with extended properties
-- Custom attributes for writing system classification
-- Advanced normalization and decomposition handling
-- File path: `src/uicu/unicode_data.py`
+3. Locale Management (Importance: 85)
+```python
+class LocaleWrapper:
+    """Thread-safe locale context manager"""
+    def __enter__(self):
+        # Saves current locale state
+        # Activates requested locale
+        
+    def __exit__(self):
+        # Restores previous locale
+```
 
-4. **Unicode Operation Pipeline** (Importance: 85)
-- Structured workflow for processing Unicode text through multiple stages
-- Configurable transformation chain for character normalization
-- Fallback handling for unsupported Unicode operations
-- File path: `src/uicu/pipeline.py`
+4. Text Segmentation Interface (Importance: 80)
+```python
+class BreakIterator:
+    """Language-aware text boundary detection"""
+    def get_boundaries(self, text, boundary_type):
+        # Detects word/sentence/line breaks
+        # Considers writing system rules
+```
 
-### Domain-Specific Implementations
+Critical File Paths:
+- src/uicu/char.py: Character property wrapping
+- src/uicu/unicode/script.py: Script detection implementation  
+- src/uicu/locale/context.py: Locale management
+- src/uicu/break/iterator.py: Text segmentation
 
-1. **Writing System Detection** (Importance: 80)
-- Custom algorithms for identifying writing systems in mixed Unicode text
-- Integration of ICU script detection with fontTools metadata
-- File path: `src/uicu/script_detect.py`
+The wrapper implementation focuses on providing Pythonic interfaces while preserving full access to ICU's internationalization capabilities. Key aspects include:
 
-2. **Unicode Data Enrichment** (Importance: 75)
-- Enhancement of Unicode character properties with additional metadata
-- Custom property definitions for specialized text processing needs
-- File path: `src/uicu/property_extend.py`
-
-### Test Infrastructure
-
-1. **Unicode Test Cases** (Importance: 70)
-- Comprehensive test suite for Unicode handling edge cases
-- Validation of character property preservation
-- File path: `tests/test_unicode_wrapper.py`
-
-2. **Integration Tests** (Importance: 75)
-- Tests for PyICU and fontTools integration points
-- Verification of combined Unicode operations
-- File path: `tests/test_integration.py`
+- Unified property access across data sources
+- Thread-safe locale handling
+- Writing system awareness
+- Clean Python integration
 
 $END$
 
