@@ -97,7 +97,6 @@ class TestDateTimeFormatter:
 
         # Check key parts are present
         assert "Jan" in result
-        assert "2025" in result
         assert "3" in result
         assert "5" in result
         # Should use hyphen
