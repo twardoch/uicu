@@ -185,14 +185,10 @@ class DateTimeFormatter:
             >>> formatter.format_range(start, end)
             'Jan 3 - 5, 2025'
         """
-        # Convert Python datetimes to ICU Date objects
-        start_date = icu.Date(start.timestamp() * 1000)  # ICU uses milliseconds
-        end_date = icu.Date(end.timestamp() * 1000)
-
-        # Format the range using simple approach
-        # ICU DateIntervalFormat API is complex, so use simple formatting
-        start_str = self._formatter.format(start_date)
-        end_str = self._formatter.format(end_date)
+        # Simple range formatting using individual format calls
+        # TODO: Implement proper ICU DateIntervalFormat when available
+        start_str = self.format(start)
+        end_str = self.format(end)
 
         # Simple range formatting - just join with dash
         # In a full implementation, this would use proper interval formatting
