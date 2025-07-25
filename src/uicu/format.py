@@ -126,11 +126,12 @@ class DateTimeFormatter:
 
         self._formatter.setTimeZone(icu_tz)
 
-    def format(self, dt: datetime) -> str:
+    def format(self, dt: datetime, tz: str | None = None) -> str:
         """Format a datetime object to a string.
 
         Args:
             dt: The datetime to format.
+            tz: Optional timezone identifier to use for formatting.
 
         Returns:
             The formatted date/time string.
@@ -150,18 +151,29 @@ class DateTimeFormatter:
         cal.set(dt.year, dt.month - 1, dt.day, dt.hour, dt.minute, dt.second)
         cal.set(icu.Calendar.MILLISECOND, dt.microsecond // 1000)
 
-        # If datetime has timezone info, set it
-        if dt.tzinfo:
+        # Handle timezone
+        if tz:
+            # Explicit timezone provided
+            if tz == 'UTC' and dt.tzinfo is None:
+                # Add UTC timezone to naive datetime
+                from datetime import timezone as pytz
+                dt = dt.replace(tzinfo=pytz.utc)
+            icu_tz = icu.TimeZone.createTimeZone(tz)
+            cal.setTimeZone(icu_tz)
+            self._formatter.setTimeZone(icu_tz)
+        elif dt.tzinfo:
+            # Use datetime's timezone info
             tz_name = dt.tzinfo.tzname(dt)
             if tz_name == "UTC":
                 # Handle UTC explicitly
-                tz = icu.TimeZone.getGMT()
-                cal.setTimeZone(tz)
-                self._formatter.setTimeZone(tz)
+                icu_tz = icu.TimeZone.getGMT()
             elif tz_name:
-                tz = icu.TimeZone.createTimeZone(tz_name)
-                cal.setTimeZone(tz)
-                self._formatter.setTimeZone(tz)
+                icu_tz = icu.TimeZone.createTimeZone(tz_name)
+            else:
+                # Fallback to GMT if no name available
+                icu_tz = icu.TimeZone.getGMT()
+            cal.setTimeZone(icu_tz)
+            self._formatter.setTimeZone(icu_tz)
 
         # Get the ICU time value
         icu_time = cal.getTime()

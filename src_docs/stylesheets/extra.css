@@ -1,0 +1,175 @@
+/* Extra CSS for UICU Documentation */
+
+/* Custom color scheme */
+:root {
+    --md-primary-fg-color: #4051b5;
+    --md-primary-fg-color--light: #5a6fd6;
+    --md-primary-fg-color--dark: #303f9f;
+    --md-accent-fg-color: #526cfe;
+}
+
+/* Code blocks */
+.highlight pre {
+    border-radius: 0.4rem;
+}
+
+/* API reference styling */
+.doc-class {
+    border-left: 3px solid var(--md-primary-fg-color);
+    padding-left: 1rem;
+    margin: 1rem 0;
+}
+
+.doc-function {
+    border-left: 3px solid var(--md-accent-fg-color);
+    padding-left: 1rem;
+    margin: 1rem 0;
+}
+
+/* Parameter tables */
+.field-list {
+    margin: 1rem 0;
+}
+
+.field-list dt {
+    font-weight: bold;
+    font-family: var(--md-code-font-family);
+}
+
+/* Grid layout for cards */
+.grid.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.grid.cards > div {
+    padding: 1.5rem;
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 0.4rem;
+    transition: box-shadow 0.25s;
+}
+
+.grid.cards > div:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* Admonition enhancements */
+.admonition {
+    font-size: 0.9rem;
+}
+
+.admonition.tip {
+    border-left-color: #00c853;
+}
+
+.admonition.warning {
+    border-left-color: #ff6e40;
+}
+
+.admonition.info {
+    border-left-color: #2196f3;
+}
+
+/* Table enhancements */
+.md-typeset table:not([class]) {
+    border-collapse: collapse;
+    border-radius: 0.4rem;
+    overflow: hidden;
+}
+
+.md-typeset table:not([class]) th {
+    background-color: var(--md-primary-fg-color);
+    color: white;
+    font-weight: bold;
+}
+
+/* Tabs styling */
+.tabbed-labels {
+    border-bottom: 2px solid var(--md-primary-fg-color--light);
+}
+
+.tabbed-labels label:hover {
+    color: var(--md-primary-fg-color);
+}
+
+/* Performance indicators */
+.perf-good {
+    color: #00c853;
+    font-weight: bold;
+}
+
+.perf-warning {
+    color: #ffa000;
+    font-weight: bold;
+}
+
+.perf-bad {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+/* Custom icons */
+.md-typeset .emoji {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: -0.2em;
+}
+
+/* Header anchors */
+.headerlink {
+    opacity: 0;
+    transition: opacity 0.25s;
+    margin-left: 0.5rem;
+}
+
+h1:hover .headerlink,
+h2:hover .headerlink,
+h3:hover .headerlink,
+h4:hover .headerlink,
+h5:hover .headerlink,
+h6:hover .headerlink {
+    opacity: 1;
+}
+
+/* Search highlighting */
+mark {
+    background-color: rgba(255, 235, 59, 0.5);
+    padding: 0.1em 0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .grid.cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* API documentation */
+.doc-object-name {
+    font-family: var(--md-code-font-family);
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.doc-object-type {
+    color: var(--md-default-fg-color--light);
+    font-size: 0.9em;
+}
+
+/* Version badge */
+.version-badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    background-color: var(--md-primary-fg-color);
+    color: white;
+    border-radius: 0.3em;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+/* Footer enhancement */
+.md-footer-meta {
+    background-color: var(--md-primary-fg-color--dark);
+}
