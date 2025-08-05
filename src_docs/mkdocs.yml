@@ -1,0 +1,161 @@
+# this_file: src_docs/mkdocs.yml
+site_name: UICU Documentation
+site_description: A Pythonic wrapper around PyICU with supplementary Unicode functionality
+site_author: UICU Contributors
+site_url: https://github.com/twardoch/uicu
+repo_url: https://github.com/twardoch/uicu
+repo_name: twardoch/uicu
+edit_uri: edit/main/src_docs/md/
+docs_dir: md
+site_dir: ../docs
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/twardoch/uicu
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/uicu/
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search:
+      lang: en
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [../src]
+          options:
+            docstring_style: google
+            docstring_section_style: list
+            show_source: true
+            show_if_no_docstring: false
+            inherited_members: true
+            merge_init_into_class: true
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: iso_date
+  - minify:
+      minify_html: true
+
+nav:
+  - Home:
+    - index.md
+    - getting-started.md
+    - installation.md
+  - User Guide:
+    - guide/index.md
+    - guide/unicode-basics.md
+    - guide/character-properties.md
+    - guide/locale-management.md
+    - guide/text-collation.md
+    - guide/text-segmentation.md
+    - guide/transliteration.md
+    - guide/date-time-formatting.md
+    - guide/best-practices.md
+  - API Reference:
+    - api/index.md
+    - api/char.md
+    - api/locale.md
+    - api/collate.md
+    - api/segment.md
+    - api/translit.md
+    - api/exceptions.md
+    - api/utils.md
+  - Examples:
+    - examples/index.md
+    - examples/character-analysis.md
+  - Development:
+    - development/index.md
+  - Changelog:
+    - changelog.md
