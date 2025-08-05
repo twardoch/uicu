@@ -1,0 +1,124 @@
+name: Test Binaries
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-binary-build:
+    name: Test Binary Build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+      - name: Install ICU dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libicu-dev pkg-config
+
+      - name: Install ICU dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install icu4c pkg-config
+          echo "PKG_CONFIG_PATH=/usr/local/opt/icu4c/lib/pkgconfig" >> $GITHUB_ENV
+
+      - name: Install ICU dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          vcpkg install icu:x64-windows
+          echo "ICU_ROOT=C:/vcpkg/installed/x64-windows" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system --upgrade pip
+          uv pip install --system ".[dev,test,all]"
+          uv pip install --system pyinstaller
+
+      - name: Build binary
+        run: |
+          chmod +x scripts/build-binary.sh
+          ./scripts/build-binary.sh
+        shell: bash
+
+      - name: Test binary functionality
+        run: |
+          # Test basic functionality
+          ./build/binary/uicu --version
+          ./build/binary/uicu --help
+          
+          # Test specific commands
+          ./build/binary/uicu name "A"
+          ./build/binary/uicu script "Hello"
+          ./build/binary/uicu transliterate "Upper" "hello"
+          ./build/binary/uicu collate "en-US" "a" "b"
+        shell: bash
+
+      - name: Upload binary for testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-binary-${{ matrix.os }}
+          path: build/binary/uicu-binary-*.tar.gz
+          retention-days: 7
+
+  integration-test:
+    name: Integration Test
+    needs: test-binary-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries/
+
+      - name: Test binary downloads
+        run: |
+          echo "Downloaded binaries:"
+          find binaries/ -name "*.tar.gz" -exec ls -la {} \;
+          
+          echo "Testing binary extraction:"
+          for binary in binaries/*/uicu-binary-*.tar.gz; do
+            echo "Testing: $binary"
+            tar -tf "$binary" | head -5
+          done
+
+      - name: Verify binary sizes
+        run: |
+          echo "Binary sizes:"
+          find binaries/ -name "*.tar.gz" -exec du -h {} \;
+          
+          # Check if binaries are not too large (>100MB might be problematic)
+          for binary in binaries/*/uicu-binary-*.tar.gz; do
+            size=$(du -m "$binary" | cut -f1)
+            echo "Binary $binary size: ${size}MB"
+            if [ "$size" -gt 100 ]; then
+              echo "Warning: Binary $binary is larger than 100MB"
+            fi
+          done
